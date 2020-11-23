@@ -8,5 +8,5 @@
   "emmet.triggerExpansionOnTab": true,
   "typescript.tsc.autoDetect": "off",
   "editor.snippetSuggestions": "top",
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
