@@ -1,0 +1,12 @@
+{
+  "emmet.includeLanguages": {
+    "typescript": "typescriptreact"
+  },
+  "emmet.syntaxProfiles": {
+    "javascript": "jsx"
+  },
+  "emmet.triggerExpansionOnTab": true,
+  "typescript.tsc.autoDetect": "off",
+  "editor.snippetSuggestions": "top",
+  "typescript.tsdk": "node_modules/typescript/lib",
+}
