@@ -16,6 +16,36 @@ const Api = {
       return request('/user/session', 'GET', context.args.token);
     },
   },
+  /**
+   * Вход пользователя
+   */
+  login: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request('/user/login', 'POST', '', context.args.body);
+    },
+  },
+  /**
+   * Регистрация пользователя
+   */
+  register: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request('/user', 'POST', '', context.args.body);
+    },
+  },
+  /**
+   * Подтверждение почты
+   */
+  confirm: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request('/user/confirm', 'GET', '', context.args.params);
+    },
+  },
 };
 
 export default Api;

@@ -4,17 +4,38 @@
  * переключение вызовов производится в ./reducers.ts
  */
 
-import { createStore, applyMiddleware } from 'redux';
+// Ассинхронные вещи делаются через redux-saga
+
+import { createStore, Store, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import Types from '../react-app-env';
 import appReducer from './reducers';
-import { userSaga } from './sagas';
+import { userSaga, loginSaga, registerSaga, confirmSaga } from './sagas';
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(appReducer, applyMiddleware(sagaMiddleware));
 // Навешивает посредников
 sagaMiddleware.run(userSaga);
+sagaMiddleware.run(loginSaga);
+sagaMiddleware.run(registerSaga);
+sagaMiddleware.run(confirmSaga);
 
-// Задает и экспортирует метод вызова саги
+/**
+ * Задает и экспортирует метод вызова саги
+ * @param actionParams - параметры
+ */
 const action = (actionParams: Types.Action) => store.dispatch(actionParams);
 export { store, action };
+
+// Синхронные обычным redux
+
+const loadStore: Store = createStore((state = false, syncAction: any) => {
+  switch (syncAction.type) {
+    case 'SET_LOAD':
+      return syncAction;
+    default:
+      return state;
+  }
+});
+
+export { loadStore };
