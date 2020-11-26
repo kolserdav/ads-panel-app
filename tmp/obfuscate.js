@@ -2,7 +2,7 @@ const JavaScriptObfuscator = require('javascript-obfuscator');
 const fs = require('fs');
 const path = require('path');
 
-const srcFilePath = path.resolve(__dirname, '../build/static/js/main.5bfd961e.chunk.js');
+const srcFilePath = path.resolve(__dirname, '../build/static/js/main.d6c301c2.chunk.js');
 
 const data = fs.readFileSync(srcFilePath).toString();
 

@@ -24,8 +24,8 @@ export default function Graph(props: Types.GraphProps) {
   return (
     <Paper>
       <Chart data={selfData}>
-        <ArgumentAxis />
-        <ValueAxis />
+        <ArgumentAxis tickSize={23} position="top" showGrid={false} />
+        <ValueAxis showGrid={true} />
 
         <LineSeries name="clicks" valueField="clicks" argumentField="date" />
         <LineSeries name="cost" valueField="cost" argumentField="date" />

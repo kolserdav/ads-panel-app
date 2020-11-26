@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { MenuItem } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
+import CostIcon from '@material-ui/icons/AttachMoney';
+import ImpressionsIcon from '@material-ui/icons/Visibility';
+import ClicksIcon from '@material-ui/icons/TouchApp';
+import RequestsIcon from '@material-ui/icons/CallMade';
 // @ts-ignore
 import Worker from 'comlink-loader!../worker/index';
 import Auth from '../components/Auth';
@@ -10,6 +14,7 @@ import * as Types from '../react-app-env';
 import Graph from '../components/Graph';
 import BlockSelect from '../components/BlockSelect';
 import { action, store, loadStore } from '../store';
+import ListElement from '../components/ListElement';
 
 const worker = new Worker();
 
@@ -35,9 +40,10 @@ const timeValues: Types.TimeValues[] = [
 
 const times: React.ReactElement[] = timeValues.map((item) => {
   let name = item.replace(/-/g, ` `);
+  const selected = name === 'last-month';
   name = lib.capitalizeFirstLetter(name);
   return (
-    <MenuItem key={item} value={item}>
+    <MenuItem key={item} value={item} selected={selected}>
       {name}
     </MenuItem>
   );
@@ -47,21 +53,33 @@ let _storeSubs = false;
 
 const DashboardElement = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const [selectValue, setSelectValue] = useState('');
+  const [selectValue, setSelectValue] = useState('last-month');
   const [graphDataArr, setGraphDataArr] = useState([]);
+  const _allStat: Types.AllStat = {
+    cost: 0,
+    impress: 0,
+    requests: 0,
+    clicks: 0,
+  };
+  const [allStat, setAllStat] = useState(_allStat);
+
+  const graphRequest = (value: Types.TimeValues) => {
+    if (value !== 'custom') {
+      action({ type: 'GRAPH_REQUESTED', args: { body: { time: value } } });
+    } else {
+      enqueueSnackbar('Custom parameter not working now...');
+    }
+  };
 
   const handleSelectChange = (event: React.ChangeEvent<{ value: any }>) => {
     loadStore.dispatch({ type: 'SET_LOAD', value: true });
     const { value } = event.target;
-    action({ type: 'GRAPH_REQUESTED', args: {
-      body: {
-        time: value
-      }
-    } })
+    graphRequest(value);
     setSelectValue(value);
   };
 
   useEffect(() => {
+    graphRequest('last-month');
     if (!_storeSubs) {
       _storeSubs = true;
       store.subscribe(() => {
@@ -75,6 +93,13 @@ const DashboardElement = () => {
           } else if (state.type === 'GRAPH_SUCCEEDED') {
             loadStore.dispatch({ type: 'SET_LOAD', value: false });
             const { data }: any = graphData;
+            const { all }: any = data.body;
+            setAllStat({
+              cost: all.cost,
+              impress: all.impressions,
+              clicks: all.clicks,
+              requests: all.requests,
+            });
             enqueueSnackbar(data?.message);
             const { graph } = data.body;
             const pr = worker.computeGraphData(graph);
@@ -85,12 +110,24 @@ const DashboardElement = () => {
         }
       });
     }
-  }, [graphDataArr]);
+  }, []);
 
   return (
     <div className={clsx('full-width')}>
-      <div className="dashboard-header">
-        <BlockSelect value={selectValue} handleChange={handleSelectChange}>
+      <div className={clsx('dashboard-header', 'row-center')}>
+        <ListElement title="Cost" value={allStat.cost}>
+          <CostIcon />
+        </ListElement>
+        <ListElement title="Impressions" value={allStat.impress}>
+          <ImpressionsIcon />
+        </ListElement>
+        <ListElement title="Requests" value={allStat.requests}>
+          <RequestsIcon />
+        </ListElement>
+        <ListElement title="Clicks" value={allStat.clicks}>
+          <ClicksIcon />
+        </ListElement>
+        <BlockSelect name="Time" value={selectValue} handleChange={handleSelectChange}>
           {times}
         </BlockSelect>
       </div>
@@ -100,7 +137,6 @@ const DashboardElement = () => {
 };
 
 export default function Dashboard() {
-
   return (
     <Auth redirect={true} roles={['admin', 'user']}>
       <DashboardElement />

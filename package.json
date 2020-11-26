@@ -61,7 +61,8 @@
     "build:prod": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "ww:check": "babel public/webworker.js --out-file public/ww-check.js"
+    "ob": "node tmp/obfuscate.js"
+
   },
   "eslintConfig": {
     "extends": [

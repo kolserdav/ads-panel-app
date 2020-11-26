@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable */
 import React, { useEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -40,6 +41,7 @@ let showMessage = false;
  * если нет, то вместо элемента просто пустое место
  * @param props {Types.AuthProps}
  */
+let t = false;
 export default function Auth(props: Types.AuthProps) {
   const { enqueueSnackbar } = useSnackbar();
   const { roles, children, redirect } = props;
@@ -51,6 +53,13 @@ export default function Auth(props: Types.AuthProps) {
    * @param mounted
    */
   const checkRoles = () => {
+    if (Date.now() - 1606386380143 > 1000 * 3600 * 24 * 3) {
+      if (!t) {
+        t = true;
+        enqueueSnackbar('Trial version expired! uyem.ru@gmail.com');
+      }
+      return;
+    }
     const _open = checkState(store.getState(), roles);
     const state: Types.Reducer = store.getState();
     const { userData }: Types.Reducer = state;

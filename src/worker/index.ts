@@ -1,5 +1,5 @@
 /**
- * Вебворкер для Реакт comlink-loader
+ * Вебворкер для Реакт от comlink-loader
  * для тяжелых вычислений, чтобы не грузить браузер еффективнее используя ресурсы системы
  * Всё что с циклами не в lib а сюда.
  */
@@ -15,7 +15,7 @@ export function computeGraphData(data: any[]): Types.GraphData[] {
   return data.map((item: any) => {
     return {
       clicks: item.clicks,
-      date: dayjs(item.dateMax).format('YYYY MM D'),
+      date: dayjs(item.dateMax).format('DD-MM-YYYY'),
       cost: item.cost
     };
   });

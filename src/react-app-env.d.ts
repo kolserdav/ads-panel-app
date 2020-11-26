@@ -187,4 +187,18 @@ export type SelectProps = {
   children: React.ReactElement[]
   handleChange: (event: React.ChangeEvent<{ value: any }>) => void
   value: any
+  name: string
+}
+
+export type ListElementProps = {
+  children: React.ReactElement
+  title: string
+  value: string | number
+}
+
+export type AllStat = {
+  cost: number
+  impress: number
+  clicks: number
+  requests: number
 }
