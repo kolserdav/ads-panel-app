@@ -13,7 +13,7 @@ const Api = {
     context: this,
     // eslint-disable-next-line no-unused-vars
     fn: (context: any, ...args: any[]): any => {
-      return request('/user/session', 'GET', context.args.token);
+      return request('/user/session', 'GET');
     },
   },
   /**
@@ -23,7 +23,8 @@ const Api = {
     context: this,
     // eslint-disable-next-line no-unused-vars
     fn: (context: any, ...args: any[]): any => {
-      return request('/user/login', 'POST', '', context.args.body);
+      // Если GET запрос то params в остальных body
+      return request('/user/login', 'POST', context.args.body);
     },
   },
   /**
@@ -33,7 +34,7 @@ const Api = {
     context: this,
     // eslint-disable-next-line no-unused-vars
     fn: (context: any, ...args: any[]): any => {
-      return request('/user', 'POST', '', context.args.body);
+      return request('/user', 'POST', context.args.body);
     },
   },
   /**
@@ -43,7 +44,37 @@ const Api = {
     context: this,
     // eslint-disable-next-line no-unused-vars
     fn: (context: any, ...args: any[]): any => {
-      return request('/user/confirm', 'GET', '', context.args.params);
+      return request('/user/confirm', 'GET', context.args.params);
+    },
+  },
+  /**
+   * Запрос на существование почты
+   */
+  getEmail: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request('/user/forgot', 'POST', context.args.body);
+    },
+  },
+  /**
+   * Смена паролей
+   */
+  changePasword: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request('/user/pass', 'PUT', context.args.body, context.args.token);
+    },
+  },
+  /**
+   * Запрос статистики для графика
+   */
+  statGraph: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request('/statistic/graph', 'POST', context.args.body);
     },
   },
 };

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 import * as Types from '../react-app-env';
 import { store, loadStore } from '../store';
 
@@ -32,12 +33,15 @@ const checkState = (state: Types.Reducer, roles: Types.Roles[]) => {
   return _open;
 };
 
+let showMessage = false;
+
 /**
  * Обертка для защиты страниц, в зависимости от roles, допускает или нет к указанному компоненту,
  * если нет, то вместо элемента просто пустое место
  * @param props {Types.AuthProps}
  */
 export default function Auth(props: Types.AuthProps) {
+  const { enqueueSnackbar } = useSnackbar();
   const { roles, children, redirect } = props;
   const [open, setOpen] = useState(false);
   const [_redirect, _setRedirect] = useState(false);
@@ -48,25 +52,33 @@ export default function Auth(props: Types.AuthProps) {
    */
   const checkRoles = () => {
     const _open = checkState(store.getState(), roles);
-    const { userData }: Types.Reducer = store.getState();
+    const state: Types.Reducer = store.getState();
+    const { userData }: Types.Reducer = state;
     if (!userData) return;
-    if (
+    // Вывод ошибки соединения ограничен одним сообщением чтобы не спамить на каждый компонент по сообщению
+    if (state.type === 'USER_FETCH_FAILED' && !showMessage) {
+      showMessage = true;
+      const { message }: any = userData.data?.errorData;
+      enqueueSnackbar(`Auth: ${message}`);
+      loadStore.dispatch({ type: 'SET_LOAD', value: false });
+    } else if (
       redirect &&
-      userData.type === 'USER_FETCH_SUCCEEDED' &&
+      state.type === 'USER_FETCH_SUCCEEDED' &&
       userData.data?.result !== 'success' &&
       !_open
     ) {
       _setRedirect(true);
     }
     setOpen(_open);
-    if (_open) {
-      loadStore.dispatch({ type: '', value: false });
+    if (_open && state.type === 'USER_FETCH_SUCCEEDED') {
+      loadStore.dispatch({ type: 'SET_LOAD', value: false });
     }
   };
 
   useEffect(() => {
     let mounted = true;
     if (mounted) checkRoles();
+    // Здесь не ограничиваем одной подпиской, так как на каждое событие своя подписка
     store.subscribe(() => {
       if (mounted) checkRoles();
     });

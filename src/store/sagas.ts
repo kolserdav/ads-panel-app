@@ -2,6 +2,7 @@
  * Файл с сагами, здесь объявляется функция задачи например для запроса на сервер и наполнения хранилища,
  * в зависимости от результата запроса.
  * И экспортируется прослушиватель для store/index.ts
+ * ВНИМАНИЕ! Здесь типы не привязаны к интерфейсам, смотреть не перепутать type! TODO - привязать пока не поздно. Начал проверять с changePassword
  */
 
 import { call, put, takeLatest } from 'redux-saga/effects';
@@ -68,6 +69,49 @@ function* confirm(action: any) {
   }
 }
 
+/**
+ * Запрос на существование почты в базе
+ * @param action
+ */
+function* getEmail(action: any) {
+  try {
+    const data = yield call(Api.getEmail, action);
+    yield put({ type: 'EMAIL_SUCCEEDED', data });
+  } catch (e) {
+    yield put({ type: 'EMAIL_FAILED', errorData });
+  }
+}
+
+/**
+ * Смена пароля
+ * @param action
+ */
+function* changePassword(action: any) {
+  try {
+    const data = yield call(Api.changePasword, action);
+    const type: Types.ActionTypesChangePass = 'CHANGE_PASS_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    const type: Types.ActionTypesChangePass = 'CHANGE_PASS_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Получение статистики графика
+ * @param action
+ */
+function* statGraph(action: any) {
+  try {
+    const data = yield call(Api.statGraph, action);
+    const type: Types.ActionTypesGraph = 'GRAPH_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    const type: Types.ActionTypesGraph = 'GRAPH_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
 // Прослушиватели задач
 
 /**
@@ -96,4 +140,27 @@ export function* registerSaga() {
  */
 export function* confirmSaga() {
   yield takeLatest('CONFIRM_REQUESTED', confirm);
+}
+
+/**
+ * Прослушиватель задачи проверки почты
+ */
+export function* emailSaga() {
+  yield takeLatest('EMAIL_REQUESTED', getEmail);
+}
+
+/**
+ * Прослушиватель задачи смены пароля
+ */
+export function* passSaga() {
+  const type: Types.ActionTypesChangePass = 'CHANGE_PASS_REQUESTED';
+  yield takeLatest(type, changePassword);
+}
+
+/**
+ * Прослушиватель задачи получение статистики графика
+ */
+export function* graphSaga() {
+  const type: Types.ActionTypesGraph = 'GRAPH_REQUESTED';
+  yield takeLatest(type, statGraph);
 }

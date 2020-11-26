@@ -10,7 +10,15 @@ import { createStore, Store, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import Types from '../react-app-env';
 import appReducer from './reducers';
-import { userSaga, loginSaga, registerSaga, confirmSaga } from './sagas';
+import {
+  userSaga,
+  loginSaga,
+  registerSaga,
+  confirmSaga,
+  emailSaga,
+  passSaga,
+  graphSaga,
+} from './sagas';
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(appReducer, applyMiddleware(sagaMiddleware));
@@ -19,6 +27,9 @@ sagaMiddleware.run(userSaga);
 sagaMiddleware.run(loginSaga);
 sagaMiddleware.run(registerSaga);
 sagaMiddleware.run(confirmSaga);
+sagaMiddleware.run(emailSaga);
+sagaMiddleware.run(passSaga);
+sagaMiddleware.run(graphSaga);
 
 /**
  * Задает и экспортирует метод вызова саги
@@ -27,7 +38,7 @@ sagaMiddleware.run(confirmSaga);
 const action = (actionParams: Types.Action) => store.dispatch(actionParams);
 export { store, action };
 
-// Синхронные обычным redux
+// Синхронные вещи делаются redux без посредников
 
 const loadStore: Store = createStore((state = false, syncAction: any) => {
   switch (syncAction.type) {

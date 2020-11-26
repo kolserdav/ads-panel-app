@@ -1,14 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, TextField, Button, FormLabel, FormGroup, Checkbox } from '@material-ui/core';
+import {
+  Typography,
+  TextField,
+  Button,
+  FormLabel,
+  FormGroup,
+  Checkbox,
+  CircularProgress,
+} from '@material-ui/core';
 import { useCookies } from 'react-cookie';
 import { useHistory } from 'react-router-dom';
 import clsx from 'clsx';
+import { useSnackbar } from 'notistack';
 import AlertMessage from '../components/AlertMessage';
 import { action, loadStore, store } from '../store';
 import * as Types from '../react-app-env';
 import Auth from '../components/Auth';
 
+// Ограничители подписок, чтобы по нескольку раз не подписывалось на одно и тоже хранилище
+let _storeSubs = false;
+let _loadStoreSubs = false;
+
 export default function Registration() {
+  const { enqueueSnackbar } = useSnackbar();
   // eslint-disable-next-line no-unused-vars
   const [cookies, setCookie] = useCookies([]);
   const [email, setEmail] = useState('');
@@ -19,6 +33,7 @@ export default function Registration() {
   const [company, setCompany] = useState('');
   const [skype, setSkype] = useState('');
   const [passwordRepeat, setPasswordRepeat] = useState('');
+  const [load, setLoad] = useState(false);
   const history = useHistory();
   const _alert: Types.AlertProps = {
     message: 'Alert closed',
@@ -28,34 +43,47 @@ export default function Registration() {
   const [alert, setAlert] = useState(_alert);
 
   useEffect(() => {
+    if (!_loadStoreSubs) {
+      _loadStoreSubs = true;
+      loadStore.subscribe(() => {
+        setLoad(loadStore.getState().value);
+      });
+    }
     // Обработчик запроса на сервер
-    store.subscribe(() => {
-      const state: Types.Reducer = store.getState();
-      if (state.registerData) {
-        if (state.registerData.type === 'REGISTRATION_SUCCEEDED') {
-          const { data } = state.registerData;
-          const newAlert: any = {
-            open: true,
-            message: data?.message,
-            status: data?.result,
-          };
-          setAlert(newAlert);
-          if (data?.result === 'success') {
-            const { token } = data.body;
-            // Устанавливате куки с токеном
-            setCookie('_qt', token, {
-              path: '/',
-              sameSite: true,
-              expires: new Date(Date.now() + 3600 * 24 * 1000 * 90),
-            });
-            setTimeout(() => {
-              history.push('/dashboard', 'redirect');
-            }, 2000);
+    if (!_storeSubs) {
+      _storeSubs = true;
+      store.subscribe(() => {
+        const state: Types.Reducer = store.getState();
+        if (state.registerData) {
+          if (state.type === 'REGISTRATION_FAILED') {
+            const { message }: any = state.registerData.data?.errorData;
+            enqueueSnackbar(`Registration: ${message}`);
+            loadStore.dispatch({ type: 'SET_LOAD', value: false });
+          } else if (state.type === 'REGISTRATION_SUCCEEDED') {
+            const { data } = state.registerData;
+            const newAlert: any = {
+              open: true,
+              message: data?.message,
+              status: data?.result,
+            };
+            setAlert(newAlert);
+            if (data?.result === 'success') {
+              const { token } = data.body;
+              // Устанавливате куки с токеном
+              setCookie('_qt', token, {
+                path: '/',
+                sameSite: true,
+                expires: new Date(Date.now() + 3600 * 24 * 1000 * 90),
+              });
+              setTimeout(() => {
+                history.push('/dashboard', 'redirect');
+              }, 2000);
+            }
+            loadStore.dispatch({ type: 'SET_LOAD', value: false });
           }
-          loadStore.dispatch({ type: 'SET_LOAD', value: false });
         }
-      }
-    });
+      });
+    }
   }, []);
 
   return (
@@ -162,31 +190,36 @@ export default function Registration() {
           </div>
         </FormGroup>
         <div className="form-item">
-          <Button
-            disabled={buttonDisable}
-            variant="contained"
-            color="secondary"
-            type="submit"
-            // eslint-disable-next-line no-unused-vars
-            onClick={(e: any) => {
-              loadStore.dispatch({ type: 'SET_LOAD', value: true });
-              action({
-                type: 'REGISTRATION_REQUESTED',
-                args: {
-                  body: {
-                    email,
-                    password,
-                    password_repeat: passwordRepeat,
-                    first_name: firstName,
-                    last_name: lastName,
-                    company,
-                    skype,
+          {load ? (
+            <CircularProgress />
+          ) : (
+            <Button
+              disabled={buttonDisable}
+              variant="contained"
+              color="secondary"
+              type="submit"
+              // eslint-disable-next-line no-unused-vars
+              onClick={(e: any) => {
+                setAlert(_alert);
+                loadStore.dispatch({ type: 'SET_LOAD', value: true });
+                action({
+                  type: 'REGISTRATION_REQUESTED',
+                  args: {
+                    body: {
+                      email,
+                      password,
+                      password_repeat: passwordRepeat,
+                      first_name: firstName,
+                      last_name: lastName,
+                      company,
+                      skype,
+                    },
                   },
-                },
-              });
-            }}>
-            Send
-          </Button>
+                });
+              }}>
+              Send
+            </Button>
+          )}
         </div>
         <div className="form-item">
           {alert.open ? <AlertMessage message={alert.message} status={alert.status} /> : ''}

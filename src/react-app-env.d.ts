@@ -44,8 +44,13 @@ export type ActionTypesUser = 'USER_FETCH_REQUESTED' | 'USER_FETCH_SUCCEEDED' | 
 export type ActionTypesLogin = 'LOGIN_REQUESTED' | 'LOGIN_SUCCEEDED' | 'LOGIN_FAILED';
 export type ActionTypesRegistration = 'REGISTRATION_REQUESTED' | 'REGISTRATION_SUCCEEDED' | 'REGISTRATION_FAILED';
 export type ActionTypesConfirm = 'CONFIRM_REQUESTED' | 'CONFIRM_SUCCEEDED' | 'CONFIRM_FAILED';
+export type ActionTypesEmail = 'EMAIL_REQUESTED' | 'EMAIL_SUCCEEDED' | 'EMAIL_FAILED';
+export type ActionTypesChangePass = 'CHANGE_PASS_REQUESTED' | 'CHANGE_PASS_SUCCEEDED' | 'CHANGE_PASS_FAILED';
+export type ActionTypesGraph = 'GRAPH_REQUESTED' | 'GRAPH_SUCCEEDED' | 'GRAPH_FAILED';
 
-export type ActionTypes = 'INITIAL_TYPE' | ActionTypesUser | ActionTypesLogin | ActionTypesRegistration | ActionTypesConfirm;
+export type ActionTypes = 'INITIAL_TYPE' | ActionTypesUser | ActionTypesLogin |
+ ActionTypesRegistration | ActionTypesConfirm | ActionTypesEmail | ActionTypesChangePass | 
+ ActionTypesGraph;
 
 export type TableStatistic = {
   date: Date
@@ -135,7 +140,8 @@ export type ServerResponse = {
     all?: any
     insertId?: number
     transactions?: Transaction[]
-  }
+  },
+  errorData?: ServerResponse
 }
 
 export type Action = {
@@ -148,17 +154,37 @@ export type Action = {
   }
 };
 
-export type AuthChildProps = {
-  user?: User
-}
-
+// Редьюсеры проверяют типы толко в компонентах, до store/reducers.ts почему-то не дотягивается
 export type Reducer = {
+  type: ActionTypes
+  data?: Action 
   initialData?: action
   userData?: Action
   loginData?: Action
   registerData?: Action
   confirmData?: Action
+  emailData?: Action
+  passData?: Action
+  graphData?: Action
+}
+
+export type GraphData = {
+  date: string
+  clicks: number
+  cost: number
+}
+
+export type GraphProps = {
+  data: GraphData[]
 }
 
 
 export type RequestMethods = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
+export type TimeValues = 'today' | 'yesterday' | 'last-3-days' | 'last-7-days' | 'this-month' | 'last-30-days' | 'last-month' | 'this-quarter' | 'this-year' | 'last-year' | 'custom';
+
+export type SelectProps = {
+  children: React.ReactElement[]
+  handleChange: (event: React.ChangeEvent<{ value: any }>) => void
+  value: any
+}

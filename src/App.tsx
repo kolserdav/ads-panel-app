@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './styles/App.scss';
-import { BrowserRouter as Router, Route, Switch, withRouter } from 'react-router-dom';
+import { Route, Switch, withRouter } from 'react-router-dom';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { Cookies } from 'react-cookie';
 import Panel from './components/Panel';
@@ -11,7 +11,8 @@ import Dashboard from './views/Dashboard';
 import Registration from './views/Registration';
 import Confirm from './views/Confirm';
 import Forgot from './views/Forgot';
-import { action, loadStore } from './store';
+import ChangePassword from './views/ChangePassword';
+import { action } from './store';
 
 const theme = createMuiTheme({
   palette: {
@@ -57,6 +58,9 @@ function App(props: any) {
         header = 'Confirm email';
         break;
       case '/forgot':
+        header = 'Change password request';
+        break;
+      case '/change-user-pwd':
         header = 'Change password';
         break;
       default:
@@ -93,6 +97,9 @@ function App(props: any) {
           </Route>
           <Route path="/forgot">
             <Forgot />
+          </Route>
+          <Route path="/change-user-pwd">
+            <ChangePassword />
           </Route>
           <Route path="/">{pathname === '/' ? <Home /> : <Page404 />}</Route>
         </Switch>

@@ -4,6 +4,12 @@
   "private": true,
   "homepage": "/",
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "@devexpress/dx-chart-core": "^2.7.3",
+    "@devexpress/dx-core": "^2.7.3",
+    "@devexpress/dx-react-chart": "^2.7.3",
+    "@devexpress/dx-react-chart-material-ui": "^2.7.3",
+    "@devexpress/dx-react-core": "^2.7.3",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
@@ -12,8 +18,11 @@
     "@testing-library/user-event": "^12.1.10",
     "classnames": "^2.2.6",
     "clsx": "^1.1.1",
+    "core-js": "^3.8.0",
+    "dayjs": "^1.9.6",
     "history": "^5.0.0",
     "node-sass": "4.14.1",
+    "notistack": "^1.0.1",
     "query-string": "^6.13.7",
     "react": "^17.0.1",
     "react-cookie": "^4.0.3",
@@ -36,6 +45,7 @@
     "@types/redux": "^3.6.0",
     "@types/redux-saga": "^0.10.5",
     "babel-eslint": "^10.1.0",
+    "comlink-loader": "^2.0.0",
     "eslint": "^7.11.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^6.15.0",
@@ -50,7 +60,8 @@
     "build": "react-scripts build",
     "build:prod": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "ww:check": "babel public/webworker.js --out-file public/ww-check.js"
   },
   "eslintConfig": {
     "extends": [
