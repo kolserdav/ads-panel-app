@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Paper } from '@material-ui/core';
-import { ArgumentAxis, ValueAxis, Chart, LineSeries } from '@devexpress/dx-react-chart-material-ui';
+import clsx from 'clsx';
+import { ArgumentAxis, ValueAxis, Chart, LineSeries, Legend } from '@devexpress/dx-react-chart-material-ui';
 import * as Types from '../react-app-env';
 
 export default function Graph(props: Types.GraphProps) {
@@ -26,9 +27,10 @@ export default function Graph(props: Types.GraphProps) {
       <Chart data={selfData}>
         <ArgumentAxis tickSize={23} position="top" showGrid={false} />
         <ValueAxis showGrid={true} />
-
-        <LineSeries name="clicks" valueField="clicks" argumentField="date" />
-        <LineSeries name="cost" valueField="cost" argumentField="date" />
+        <LineSeries name="Impressions" valueField="impressions" argumentField="date" />
+        <LineSeries name="Requests" valueField="requests" argumentField="date" />
+        <LineSeries name="Clicks" valueField="clicks" argumentField="date" />
+        <Legend position="bottom" />
       </Chart>
     </Paper>
   );

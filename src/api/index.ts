@@ -77,6 +77,16 @@ const Api = {
       return request('/statistic/graph', 'POST', context.args.body);
     },
   },
+  /**
+   * Запрос статистики для таблицы
+   */
+  statTable: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request('/statistic/table', 'POST', context.args.body);
+    },
+  },
 };
 
 export default Api;

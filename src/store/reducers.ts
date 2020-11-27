@@ -229,7 +229,7 @@ export default function appReducer(state = initialState, action: Types.Action): 
         },
       });
     /**
-     * Смена пароля
+     * Получение статистики графика
      */
     case 'GRAPH_REQUESTED':
       copyState = Object.assign(copyState, state);
@@ -257,6 +257,39 @@ export default function appReducer(state = initialState, action: Types.Action): 
       copyState.data = action;
       return Object.assign(copyState, {
         graphData: {
+          type: action.type,
+          data: action,
+        },
+      });
+    /**
+     * Получение статистики таблицы
+     */
+    case 'TABLE_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        tableData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'TABLE_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        tableData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'TABLE_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        tableData: {
           type: action.type,
           data: action,
         },

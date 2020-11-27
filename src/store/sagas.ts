@@ -112,6 +112,21 @@ function* statGraph(action: any) {
   }
 }
 
+/**
+ * Получение статистики таблицы
+ * @param action
+ */
+function* statTable(action: any) {
+  try {
+    const data = yield call(Api.statTable, action);
+    const type: Types.ActionTypesTable = 'TABLE_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    const type: Types.ActionTypesTable = 'TABLE_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
 // Прослушиватели задач
 
 /**
@@ -163,4 +178,12 @@ export function* passSaga() {
 export function* graphSaga() {
   const type: Types.ActionTypesGraph = 'GRAPH_REQUESTED';
   yield takeLatest(type, statGraph);
+}
+
+/**
+ * Прослушиватель задачи получение статистики таблицы
+ */
+export function* tableSaga() {
+  const type: Types.ActionTypesTable = 'TABLE_REQUESTED';
+  yield takeLatest(type, statTable);
 }

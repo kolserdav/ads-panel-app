@@ -7,6 +7,17 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+// Для отладки по параметрам экрана
+if (process.env.NODE_ENV === 'development') {
+  window.addEventListener('resize', () => {
+    const body = document.querySelector('body');
+    // eslint-disable-next-line no-console
+    console.info('height', body?.clientHeight);
+    // eslint-disable-next-line no-console
+    console.info('width', body?.clientWidth);
+  });
+}
+
 ReactDOM.render(
   <React.StrictMode>
     <Router>

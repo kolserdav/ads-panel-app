@@ -27,10 +27,26 @@
   align-items: center;
 }
 
+.col-start {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .row-center {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.row-start {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
 }
 
 .form-item {
@@ -43,4 +59,57 @@
 
 .full-width {
   width: 100%;
+}
+
+.dashboard-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  @media (max-width: 879px) {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.date-pickers {
+  z-index: 12;
+}
+
+.date-picker {
+  margin: 5px;
+  text-align: left;
+  @media (max-width: 1090px) {
+    margin-left: 10px;
+  }
+}
+
+.select-time {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  @media (max-width: 1090px) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.center {
+  vertical-align: center;
+}
+
+.margin-3 {
+  margin: auto 3px 0 0;
+}
+
+.icon-button {
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  opacity: 0.7;
+}
+
+.icon-button:active {
+  opacity: 1.0;
 }

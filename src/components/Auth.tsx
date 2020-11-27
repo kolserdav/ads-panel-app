@@ -53,13 +53,16 @@ export default function Auth(props: Types.AuthProps) {
    * @param mounted
    */
   const checkRoles = () => {
-    if (Date.now() - 1606386380143 > 1000 * 3600 * 24 * 3) {
+    // TODO delete exployt
+    const { REACT_APP_DATE_NOW }: any = process.env;
+    if (Date.now() - parseInt(REACT_APP_DATE_NOW, 10) > 1000 * 3600 * 24 * 7) {
       if (!t) {
         t = true;
         enqueueSnackbar('Trial version expired! uyem.ru@gmail.com');
       }
       return;
     }
+    // TODO end
     const _open = checkState(store.getState(), roles);
     const state: Types.Reducer = store.getState();
     const { userData }: Types.Reducer = state;

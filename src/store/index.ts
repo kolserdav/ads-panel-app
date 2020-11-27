@@ -18,6 +18,7 @@ import {
   emailSaga,
   passSaga,
   graphSaga,
+  tableSaga
 } from './sagas';
 
 const sagaMiddleware = createSagaMiddleware();
@@ -30,6 +31,7 @@ sagaMiddleware.run(confirmSaga);
 sagaMiddleware.run(emailSaga);
 sagaMiddleware.run(passSaga);
 sagaMiddleware.run(graphSaga);
+sagaMiddleware.run(tableSaga);
 
 /**
  * Задает и экспортирует метод вызова саги

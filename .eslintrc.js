@@ -21,6 +21,7 @@ module.exports = {
   plugins: ['react', 'prettier'],
   ignorePatterns: ['**/*.d.ts', 'build', 'tmp'],
   rules: {
+    'react/no-array-index-key': 0,
     'import/no-webpack-loader-syntax': 0,
     'prefer-const': 1,
     'react/jsx-boolean-value': 0,

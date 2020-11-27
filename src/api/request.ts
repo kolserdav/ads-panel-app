@@ -7,7 +7,10 @@ import * as Types from '../react-app-env';
 
 const cookies = new Cookies();
 
-const { REACT_APP_SERVER_URL } = process.env;
+const { REACT_APP_SERVER_URL, REACT_APP_SERVER_URL_LOCAL, NODE_ENV } = process.env;
+const dev = NODE_ENV === 'development';
+
+const serverUrl = dev ? REACT_APP_SERVER_URL_LOCAL : REACT_APP_SERVER_URL_LOCAL;
 
 export default function request(
   path: string,
@@ -32,14 +35,14 @@ export default function request(
     if (paramBody && method === 'GET') {
       query = lib.stringifyQuery(paramBody);
     }
-    fetch(`${REACT_APP_SERVER_URL}${path}${query}`, params)
+    fetch(`${serverUrl}${path}${query}`, params)
       .then((r: any) => r.json())
       .then((data: any) => {
         resolve(data);
       })
       .catch((e: Error) => {
         // eslint-disable-next-line no-console
-        if (process.env.NODE_ENV === 'development') console.error(e);
+        if (dev) console.error(e);
         reject(e);
       });
   });

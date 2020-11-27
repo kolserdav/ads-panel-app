@@ -47,10 +47,11 @@ export type ActionTypesConfirm = 'CONFIRM_REQUESTED' | 'CONFIRM_SUCCEEDED' | 'CO
 export type ActionTypesEmail = 'EMAIL_REQUESTED' | 'EMAIL_SUCCEEDED' | 'EMAIL_FAILED';
 export type ActionTypesChangePass = 'CHANGE_PASS_REQUESTED' | 'CHANGE_PASS_SUCCEEDED' | 'CHANGE_PASS_FAILED';
 export type ActionTypesGraph = 'GRAPH_REQUESTED' | 'GRAPH_SUCCEEDED' | 'GRAPH_FAILED';
+export type ActionTypesTable = 'TABLE_REQUESTED' | 'TABLE_SUCCEEDED' | 'TABLE_FAILED';
 
 export type ActionTypes = 'INITIAL_TYPE' | ActionTypesUser | ActionTypesLogin |
  ActionTypesRegistration | ActionTypesConfirm | ActionTypesEmail | ActionTypesChangePass | 
- ActionTypesGraph;
+ ActionTypesGraph | ActionTypesTable;
 
 export type TableStatistic = {
   date: Date
@@ -166,12 +167,7 @@ export type Reducer = {
   emailData?: Action
   passData?: Action
   graphData?: Action
-}
-
-export type GraphData = {
-  date: string
-  clicks: number
-  cost: number
+  tableData?: Action
 }
 
 export type GraphProps = {
@@ -197,8 +193,66 @@ export type ListElementProps = {
 }
 
 export type AllStat = {
-  cost: number
-  impress: number
+  cost?: number
+  impressions: number
   clicks: number
   requests: number
+}
+
+export type DatePicker = {
+  startDate: Date
+  onChange: (date: Date) => void
+}
+
+export type TableStatisticRow = {
+  first: string
+  value: any
+  second: string
+  impressions: number
+  requests: number
+  cost: number
+  clicks: number
+  ctr: number
+  requests: number
+  winRatio: number
+  countEvents: number
+}
+
+export type TableStatisticProps = {
+  firstColumn: string
+  rows: TableStatisticRow[]
+  icons: SortIconsElements
+}
+
+// Возможные варианты группировок
+export type GroupBy = 'date' | 'user' | 'campaign' | 'subid' | 'country';
+
+export type OrderByGroupedVariants = 'date' | 'campaign' | 'subid' | 'country'
+
+export type OrderByStaticVariants = 'requests' | 'impressions' | 'clicks' | 'cost';
+
+export type OrderByVariants = OrderByStaticVariants  | OrderByGroupedVariants;
+
+export type SortIcons = {
+  value: OrderByGroupedVariants
+  requests: OrderByStaticVariants
+  impressions: OrderByStaticVariants
+  clicks: OrderByStaticVariants
+  cost: OrderByStaticVariants
+}
+
+export type SortIconsElements = {
+  value: React.ReactElement
+  requests: React.ReactElement
+  impressions: React.ReactElement
+  clicks: React.ReactElement
+  cost: React.ReactElement
+}
+
+export type Pagination = {
+  count: number
+  page: number
+  rowsPerPage: number
+  handleChangePage: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void
+  handleChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
 }
