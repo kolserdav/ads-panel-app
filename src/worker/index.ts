@@ -78,3 +78,18 @@ export function computeTableData(data: any[], groupBy: Types.GroupBy): Types.Tab
     };
   });
 }
+
+/**
+ * Расчет данных для таблицы кампаний админа.
+ * @param data - данные с сервера
+ */
+export function computeAdminCampaignsData(data: any[]): Types.TableCampaignsRow[] {
+  return data.map((item: any) => {
+    return {
+      id: item.id,
+      title: item.title,
+      status: item.status,
+      owner: `${item.first_name} ${item.last_name}`,
+    };
+  });
+}

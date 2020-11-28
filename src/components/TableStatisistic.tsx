@@ -16,7 +16,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function DenseTable(props: Types.TableStatisticProps) {
+export default function TableStatistic(props: Types.TableStatisticProps) {
   const { rows, firstColumn, icons } = props;
   const classes = useStyles();
 

@@ -11,7 +11,9 @@ import Dashboard from './views/Dashboard';
 import Registration from './views/Registration';
 import Confirm from './views/Confirm';
 import Forgot from './views/Forgot';
+import Campaigns from './views/Campaigns';
 import ChangePassword from './views/ChangePassword';
+import CreateCampaign from './views/CreateCampaign';
 import { action } from './store';
 
 const theme = createMuiTheme({
@@ -63,6 +65,12 @@ function App(props: any) {
       case '/change-user-pwd':
         header = 'Change password';
         break;
+      case '/campaigns':
+        header = 'Campaigns';
+        break;
+      case '/new-campaign':
+        header = 'Create new campaign';
+        break;
       default:
         break;
     }
@@ -100,6 +108,12 @@ function App(props: any) {
           </Route>
           <Route path="/change-user-pwd">
             <ChangePassword />
+          </Route>
+          <Route path="/campaigns">
+            <Campaigns />
+          </Route>
+          <Route path="/new-campaign">
+            <CreateCampaign />
           </Route>
           <Route path="/">{pathname === '/' ? <Home /> : <Page404 />}</Route>
         </Switch>

@@ -127,6 +127,66 @@ function* statTable(action: any) {
   }
 }
 
+/**
+ * Получение кампаний
+ * @param action
+ */
+function* getCampaigns(action: any) {
+  try {
+    const data = yield call(Api.getCampaigns, action);
+    const type: Types.ActionTypesCampaignsGet = 'GET_CAMPAIGNS_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    const type: Types.ActionTypesCampaignsGet = 'GET_CAMPAIGNS_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Изменение статуса кампании
+ * @param action
+ */
+function* changeCampaignStatus(action: any) {
+  try {
+    const data = yield call(Api.changeCampaignStatus, action);
+    const type: Types.ActionTypesChangeCampaignStatus = 'CHANGE_CAMPAIGN_STATUS_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    const type: Types.ActionTypesChangeCampaignStatus = 'CHANGE_CAMPAIGN_STATUS_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Создание кампании
+ * @param action
+ */
+function* createCampaign(action: any) {
+  try {
+    const data = yield call(Api.createCampaign, action);
+    const type: Types.ActionTypesCreateCampaign = 'CREATE_CAMPAIGN_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    const type: Types.ActionTypesCreateCampaign = 'CREATE_CAMPAIGN_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Поиск страны
+ * @param action
+ */
+function* searchCountries(action: any) {
+  try {
+    const data = yield call(Api.searchCoutries, action);
+    const type: Types.ActionTypesSearchCounrties = 'SEARCH_COUNTRIES_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    const type: Types.ActionTypesSearchCounrties = 'SEARCH_COUNTRIES_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
 // Прослушиватели задач
 
 /**
@@ -186,4 +246,36 @@ export function* graphSaga() {
 export function* tableSaga() {
   const type: Types.ActionTypesTable = 'TABLE_REQUESTED';
   yield takeLatest(type, statTable);
+}
+
+/**
+ * Прослушиватель задачи получения кампаний
+ */
+export function* getCampaignsSaga() {
+  const type: Types.ActionTypesCampaignsGet = 'GET_CAMPAIGNS_REQUESTED';
+  yield takeLatest(type, getCampaigns);
+}
+
+/**
+ * Прослушиватель задачи изменения статуса кампании
+ */
+export function* changeCampaignStatusSaga() {
+  const type: Types.ActionTypesChangeCampaignStatus = 'CHANGE_CAMPAIGN_STATUS_REQUESTED';
+  yield takeLatest(type, changeCampaignStatus);
+}
+
+/**
+ * Прослушиватель задачи создания кампании
+ */
+export function* createCampaignSaga() {
+  const type: Types.ActionTypesCreateCampaign = 'CREATE_CAMPAIGN_REQUESTED';
+  yield takeLatest(type, createCampaign);
+}
+
+/**
+ * Прослушиватель задачи поиска стран
+ */
+export function* searchCountriesSaga() {
+  const type: Types.ActionTypesSearchCounrties = 'SEARCH_COUNTRIES_REQUESTED';
+  yield takeLatest(type, searchCountries);
 }

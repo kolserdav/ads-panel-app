@@ -10,7 +10,7 @@ const cookies = new Cookies();
 const { REACT_APP_SERVER_URL, REACT_APP_SERVER_URL_LOCAL, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
 
-const serverUrl = dev ? REACT_APP_SERVER_URL_LOCAL : REACT_APP_SERVER_URL_LOCAL;
+const serverUrl = dev ? REACT_APP_SERVER_URL_LOCAL : REACT_APP_SERVER_URL;
 
 export default function request(
   path: string,

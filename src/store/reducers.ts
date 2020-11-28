@@ -294,6 +294,138 @@ export default function appReducer(state = initialState, action: Types.Action): 
           data: action,
         },
       });
+    /**
+     * Получение кампаний
+     */
+    case 'GET_CAMPAIGNS_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        getCampaignsData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'GET_CAMPAIGNS_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        getCampaignsData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'GET_CAMPAIGNS_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        getCampaignsData: {
+          type: action.type,
+          data: action,
+        },
+      });
+    /**
+     * Изменение статуса кампании
+     */
+    case 'CHANGE_CAMPAIGN_STATUS_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        changeCampaignStatusData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'CHANGE_CAMPAIGN_STATUS_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        changeCampaignStatusData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'CHANGE_CAMPAIGN_STATUS_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        changeCampaignStatusData: {
+          type: action.type,
+          data: action,
+        },
+      });
+    /**
+     * Создание кампании
+     */
+    case 'CREATE_CAMPAIGN_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        createCampaignData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'CREATE_CAMPAIGN_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        createCampaignData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'CREATE_CAMPAIGN_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        createCampaignData: {
+          type: action.type,
+          data: action,
+        },
+      });
+    /**
+     * Поиск стран
+     */
+    case 'SEARCH_COUNTRIES_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        searchCountriesData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'SEARCH_COUNTRIES_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        searchCountriesData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'SEARCH_COUNTRIES_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        searchCountriesData: {
+          type: action.type,
+          data: action,
+        },
+      });
     default:
       return state;
   }

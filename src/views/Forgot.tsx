@@ -13,11 +13,11 @@ import AlertMessage from '../components/AlertMessage';
 import { action, store, loadStore } from '../store';
 import * as Types from '../react-app-env';
 
-let _storeSubs = false;
-let _loadStoreSubs = false;
+let _storeSubs: any = () => {};
+let _loadStoreSubs: any = () => {};
 
 export default function Confirm() {
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const [load, setLoad] = useState(false);
   const [email, setEmail] = useState('');
   const _alert: Types.AlertProps = {
@@ -27,34 +27,32 @@ export default function Confirm() {
   };
   const [alert, setAlert] = useState(_alert);
   useEffect(() => {
-    if (!_loadStoreSubs) {
-      _loadStoreSubs = true;
-      loadStore.subscribe(() => {
-        setLoad(loadStore.getState().value);
-      });
-    }
-    if (!_storeSubs) {
-      _storeSubs = true;
-      store.subscribe(() => {
-        const state = store.getState();
-        const { emailData } = state;
-        if (emailData) {
-          if (state.type === 'EMAIL_SUCCEEDED') {
-            const { data }: any = emailData;
-            setAlert({
-              message: data.message,
-              status: data.result,
-              open: true,
-            });
-            loadStore.dispatch({ type: 'SET_LOAD', value: false });
-          } else if (state.type === 'EMAIL_FAILED') {
-            const { message }: any = emailData.data?.errorData;
-            enqueueSnackbar(`Forgot password: ${message}`);
-            loadStore.dispatch({ type: 'SET_LOAD', value: false });
-          }
+    _loadStoreSubs = loadStore.subscribe(() => {
+      setLoad(loadStore.getState().value);
+    });
+    _storeSubs = store.subscribe(() => {
+      const state = store.getState();
+      const { emailData } = state;
+      if (emailData) {
+        if (state.type === 'EMAIL_SUCCEEDED') {
+          const { data }: any = emailData;
+          setAlert({
+            message: data.message,
+            status: data.result,
+            open: true,
+          });
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+        } else if (state.type === 'EMAIL_FAILED') {
+          const { message }: any = emailData.data?.errorData;
+          enqueueSnackbar(`Forgot password: ${message}`);
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
         }
-      });
-    }
+      }
+    });
+    return () => {
+      _storeSubs();
+      _loadStoreSubs();
+    };
   }, []);
 
   return (

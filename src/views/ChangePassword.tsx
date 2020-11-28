@@ -5,13 +5,12 @@ import queryString from 'query-string';
 import clsx from 'clsx';
 import { useSnackbar } from 'notistack';
 import BlockProgress from '../components/BlockProgress';
-import Auth from '../components/Auth';
 import AlertMessage from '../components/AlertMessage';
 import { loadStore, store, action } from '../store';
 import * as Types from '../react-app-env';
 
-let _storeSubs = false;
-let _loadStoreSubs = false;
+let _storeSubs: any = () => {};
+let _loadStoreSubs: any = () => {};
 
 export default function ChangePassword() {
   const { enqueueSnackbar } = useSnackbar();
@@ -28,39 +27,37 @@ export default function ChangePassword() {
   const [alert, setAlert] = useState(_alert);
 
   useEffect(() => {
-    if (!_loadStoreSubs) {
-      _loadStoreSubs = true;
-      loadStore.subscribe(() => {
-        setLoad(loadStore.getState().value);
-      });
-    }
-    if (!_storeSubs) {
-      _storeSubs = true;
-      store.subscribe(() => {
-        const state = store.getState();
-        if (state.passData) {
-          if (state.type === 'CHANGE_PASS_FAILED') {
-            const { message }: any = state.passData?.data?.errorData;
-            enqueueSnackbar(`Change password: ${message}`);
-            loadStore.dispatch({ type: 'SET_LOAD', value: false });
-          } else if (state.type === 'CHANGE_PASS_SUCCEEDED') {
-            loadStore.dispatch({ type: 'SET_LOAD', value: false });
-            const { data } = state.passData;
-            const newAlert: any = {
-              open: true,
-              message: data?.message,
-              status: data?.result,
-            };
-            setAlert(newAlert);
-            if (data?.result === 'success') {
-              setTimeout(() => {
-                history.push('/');
-              }, 1500);
-            }
+    _loadStoreSubs = loadStore.subscribe(() => {
+      setLoad(loadStore.getState().value);
+    });
+    _storeSubs = store.subscribe(() => {
+      const state = store.getState();
+      if (state.passData) {
+        if (state.type === 'CHANGE_PASS_FAILED') {
+          const { message }: any = state.passData?.data?.errorData;
+          enqueueSnackbar(`Change password: ${message}`);
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+        } else if (state.type === 'CHANGE_PASS_SUCCEEDED') {
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+          const { data } = state.passData;
+          const newAlert: any = {
+            open: true,
+            message: data?.message,
+            status: data?.result,
+          };
+          setAlert(newAlert);
+          if (data?.result === 'success') {
+            setTimeout(() => {
+              history.push('/');
+            }, 1500);
           }
         }
-      });
-    }
+      }
+    });
+    return () => {
+      _storeSubs();
+      _loadStoreSubs();
+    };
   }, []);
 
   const token: any = parsedQuery.k;

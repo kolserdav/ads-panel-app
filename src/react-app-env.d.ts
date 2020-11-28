@@ -9,9 +9,16 @@ export type PanelProps = {
 export type DialogProps = {
   open: boolean
   title: string
-  content: string
+  content: string | React.ReactElement
   handleClose: () => void
   handleAccept: () => void
+}
+
+export type DialogState = {
+  id: number
+  open: boolean
+  title: string
+  content: string | React.ReactElement
 }
 
 export type AlertProps = {
@@ -48,10 +55,15 @@ export type ActionTypesEmail = 'EMAIL_REQUESTED' | 'EMAIL_SUCCEEDED' | 'EMAIL_FA
 export type ActionTypesChangePass = 'CHANGE_PASS_REQUESTED' | 'CHANGE_PASS_SUCCEEDED' | 'CHANGE_PASS_FAILED';
 export type ActionTypesGraph = 'GRAPH_REQUESTED' | 'GRAPH_SUCCEEDED' | 'GRAPH_FAILED';
 export type ActionTypesTable = 'TABLE_REQUESTED' | 'TABLE_SUCCEEDED' | 'TABLE_FAILED';
+export type ActionTypesCampaignsGet = 'GET_CAMPAIGNS_REQUESTED' | 'GET_CAMPAIGNS_SUCCEEDED' | 'GET_CAMPAIGNS_FAILED';
+export type ActionTypesChangeCampaignStatus = 'CHANGE_CAMPAIGN_STATUS_REQUESTED' | 'CHANGE_CAMPAIGN_STATUS_SUCCEEDED' | 'CHANGE_CAMPAIGN_STATUS_FAILED';
+export type ActionTypesCreateCampaign = 'CREATE_CAMPAIGN_REQUESTED' | 'CREATE_CAMPAIGN_SUCCEEDED' | 'CREATE_CAMPAIGN_FAILED';
+export type ActionTypesSearchCounrties = 'SEARCH_COUNTRIES_REQUESTED' | 'SEARCH_COUNTRIES_SUCCEEDED' | 'SEARCH_COUNTRIES_FAILED';
 
 export type ActionTypes = 'INITIAL_TYPE' | ActionTypesUser | ActionTypesLogin |
  ActionTypesRegistration | ActionTypesConfirm | ActionTypesEmail | ActionTypesChangePass | 
- ActionTypesGraph | ActionTypesTable;
+ ActionTypesGraph | ActionTypesTable | ActionTypesCampaignsGet | ActionTypesChangeCampaignStatus | 
+ ActionTypesCreateCampaign | ActionTypesSearchCounrties;
 
 export type TableStatistic = {
   date: Date
@@ -118,6 +130,12 @@ export type User = {
   updated: Date
 };
 
+export type Country = {
+  id?: number
+  code: string
+  name: string
+}
+
 export type ServerResponse = {
   result: 'error' | 'warning' | 'success' | 'wait'
   message: string
@@ -141,6 +159,7 @@ export type ServerResponse = {
     all?: any
     insertId?: number
     transactions?: Transaction[]
+    countries?: Country[]
   },
   errorData?: ServerResponse
 }
@@ -152,6 +171,7 @@ export type Action = {
     token?: string
     body?: any
     params?: any
+    id?: number
   }
 };
 
@@ -168,12 +188,15 @@ export type Reducer = {
   passData?: Action
   graphData?: Action
   tableData?: Action
+  getCampaignsData?: Action
+  changeCampaignStatusData?: Action
+  createCampaignData?: Action
+  searchCountriesData?: Action
 }
 
 export type GraphProps = {
   data: GraphData[]
 }
-
 
 export type RequestMethods = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -255,4 +278,30 @@ export type Pagination = {
   rowsPerPage: number
   handleChangePage: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void
   handleChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+}
+
+// Тип  статусов кампаний 
+export type CampaignStatus = 'active' | 'pause' | 'pending' | 'budget';
+
+export type TableCampaignsProps = {
+  rows: TableCampaignsRow[]
+  handleChangeStatus: (status: CampaignStatus, name: string, id: number) => (e: MouseEvent<HTMLButtonElement, MouseEvent>) => void
+}
+
+export type TableCampaignsRow = {
+  title: string
+  status: CampaignStatus
+  owner: string
+  id: number
+}
+
+export type DialogContentProps = {
+  statusInit: CampaignStatus
+  name: string
+  options: React.ReactElement[]
+}
+
+export type PopperProps = {
+  anchorEl: null | HTMLElement
+  content: ReactElement<any, any>
 }

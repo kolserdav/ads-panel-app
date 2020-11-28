@@ -18,7 +18,11 @@ import {
   emailSaga,
   passSaga,
   graphSaga,
-  tableSaga
+  tableSaga,
+  getCampaignsSaga,
+  changeCampaignStatusSaga,
+  createCampaignSaga,
+  searchCountriesSaga,
 } from './sagas';
 
 const sagaMiddleware = createSagaMiddleware();
@@ -32,6 +36,10 @@ sagaMiddleware.run(emailSaga);
 sagaMiddleware.run(passSaga);
 sagaMiddleware.run(graphSaga);
 sagaMiddleware.run(tableSaga);
+sagaMiddleware.run(getCampaignsSaga);
+sagaMiddleware.run(changeCampaignStatusSaga);
+sagaMiddleware.run(createCampaignSaga);
+sagaMiddleware.run(searchCountriesSaga);
 
 /**
  * Задает и экспортирует метод вызова саги

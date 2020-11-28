@@ -1,8 +1,6 @@
 import React from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import * as Types from '../react-app-env';
@@ -22,7 +20,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function SimpleSelect(props: Types.SelectProps) {
   const { children, handleChange, value, name } = props;
   const classes = useStyles();
-
   return (
     <div>
       <FormControl variant="outlined" className={classes.formControl}>

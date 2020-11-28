@@ -1,3 +1,7 @@
+/**
+ * Дашборд клиента и админа
+ * выдаваемая информация определяется сервером по токену запроса, в зависимости от роли
+ */
 import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { MenuItem, IconButton, Tooltip } from '@material-ui/core';
@@ -12,7 +16,7 @@ import ArrowUpIcon from '@material-ui/icons/ArrowUpward';
 import ArrowsDownIcon from '@material-ui/icons/ArrowDownward';
 import HelpIcon from '@material-ui/icons/Help';
 // @ts-ignore
-import Worker from 'comlink-loader!../worker/index';
+import Worker from 'comlink-loader!../worker/index'; // Так подключили вебворкер
 import Auth from '../components/Auth';
 import * as lib from '../lib';
 import * as Types from '../react-app-env';
@@ -27,6 +31,7 @@ import BlockTablePagination from '../components/Pagination';
 
 const worker = new Worker();
 
+// Значения времени для селектора
 const timeValues: Types.TimeValues[] = [
   'today',
   'yesterday',
@@ -41,6 +46,7 @@ const timeValues: Types.TimeValues[] = [
   'custom',
 ];
 
+// Получение options для селектора времени
 const times: React.ReactElement[] = timeValues.map((item) => {
   let name = item.replace(/-/g, ` `);
   const selected = name === 'last-month';
@@ -52,8 +58,10 @@ const times: React.ReactElement[] = timeValues.map((item) => {
   );
 });
 
+// Значения селектора группировки
 const groupByValues: Types.GroupBy[] = ['date', 'user', 'campaign', 'subid', 'country'];
 
+// Options для селектора группировки
 const groupByOptions: React.ReactElement[] = groupByValues.map((item: Types.GroupBy) => {
   const name = lib.capitalizeFirstLetter(item);
   const selected = item === 'campaign';
@@ -64,8 +72,10 @@ const groupByOptions: React.ReactElement[] = groupByValues.map((item: Types.Grou
   );
 });
 
+// Динамические значения колонки группировки таблицы статистики
 const groupDynamic: any = ['date', 'campaign', 'subid', 'country'];
 
+// Все возможные значения колонок таблицы сортировки
 const sortIconsValues: Types.OrderByVariants[] = [
   'date',
   'campaign',
@@ -77,14 +87,15 @@ const sortIconsValues: Types.OrderByVariants[] = [
   'cost',
 ];
 
-let _storeSubs = false;
-let _loadStoreSubs = false;
+// Глобальные переменные, значение которых нужны мгновенно и при их изменении не требуется рендеринг
 let _desc = false;
 let _time = 'last-month';
 let _group: Types.OrderByVariants = 'campaign';
 let _customTime: any = [];
 let _sort = _group;
 let _rowsPerPage = 10;
+let _storeSubs: any = () => {};
+let _loadStoreSubs: any = () => {};
 
 const DashboardElement = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -111,6 +122,7 @@ const DashboardElement = () => {
   const [count, setCount] = useState(11);
   const [tooltip, setTooltip] = useState(false);
 
+  // Запрос данных таблицы с учетом сортировки
   const setSortAndDesc = (
     sortValue: Types.OrderByVariants,
     descValue: boolean,
@@ -129,6 +141,16 @@ const DashboardElement = () => {
           current: current + 1,
           customTime: _customTime,
         },
+      },
+    });
+  };
+
+  // TODO объединить в одну с setSortAndDesc и сделать обновление при запросе графика
+  const tableRequest = (time: Types.TimeValues, group: Types.GroupBy) => {
+    action({
+      type: 'TABLE_REQUESTED',
+      args: {
+        body: { time, group, limit: _rowsPerPage, current: page + 1, customTime: _customTime },
       },
     });
   };
@@ -217,6 +239,7 @@ const DashboardElement = () => {
 
   const [icons, setIcons] = useState(getSortIcons());
 
+  // Запрос данных графика
   const graphRequest = (value: Types.TimeValues) => {
     const _showDP = value === 'custom';
     if (!_showDP) {
@@ -229,16 +252,7 @@ const DashboardElement = () => {
     }
   };
 
-  // TODO объединить в одну с setSortAndDesc и сделать обновление при запросе графика
-  const tableRequest = (time: Types.TimeValues, group: Types.GroupBy) => {
-    action({
-      type: 'TABLE_REQUESTED',
-      args: {
-        body: { time, group, limit: _rowsPerPage, current: page + 1, customTime: _customTime },
-      },
-    });
-  };
-
+  // Запрос данных графика если указано время custom
   const getCustomTime = () => {
     _customTime = [dateFrom, dateTo];
     loadStore.dispatch({ type: 'SET_LOAD', value: true });
@@ -250,6 +264,7 @@ const DashboardElement = () => {
     });
   };
 
+  // Обработчик события изменения времени
   const handleSelectChange = (event: React.ChangeEvent<{ value: any }>) => {
     loadStore.dispatch({ type: 'SET_LOAD', value: true });
     const { value } = event.target;
@@ -258,6 +273,7 @@ const DashboardElement = () => {
     setSelectValue(value);
   };
 
+  // Обработчик события изменения группировки
   const changeGroupBy = (e: React.ChangeEvent<{ value: any }>) => {
     const { value } = e.target;
     _group = value;
@@ -267,71 +283,82 @@ const DashboardElement = () => {
   };
 
   useEffect(() => {
+    let mounted = true;
     graphRequest('last-month');
     tableRequest('last-month', 'campaign');
-    if (!_loadStoreSubs) {
-      _loadStoreSubs = true;
-      loadStore.subscribe(() => {
-        setLoad(loadStore.getState().value);
-      });
-    }
-    if (!_storeSubs) {
-      _storeSubs = true;
-      store.subscribe(() => {
-        const state = store.getState();
-        const { graphData, tableData } = state;
-        if (graphData) {
-          if (state.type === 'GRAPH_FAILED') {
-            const { message }: any = graphData.data?.errorData;
-            enqueueSnackbar(`Graph statistic: ${message}`);
-            loadStore.dispatch({ type: 'SET_LOAD', value: false });
-          } else if (state.type === 'GRAPH_SUCCEEDED') {
-            loadStore.dispatch({ type: 'SET_LOAD', value: false });
-            const { data }: any = graphData;
-            const { all }: any = data.body;
+    _loadStoreSubs = loadStore.subscribe(() => {
+      setLoad(loadStore.getState().value);
+    });
+    _storeSubs = store.subscribe(() => {
+      const state = store.getState();
+      const { graphData, tableData } = state;
+      if (graphData) {
+        if (state.type === 'GRAPH_FAILED') {
+          const { message }: any = graphData.data?.errorData;
+          enqueueSnackbar(`Graph statistic: ${message}`);
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+        } else if (state.type === 'GRAPH_SUCCEEDED') {
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+          const { data }: any = graphData;
+          if (data?.result !== 'success') {
+            enqueueSnackbar(data?.message);
+            return 1;
+          }
+          const { all }: any = data.body;
+          if (mounted) {
             setAllStat({
               cost: all.cost,
               impressions: all.impressions,
               clicks: all.clicks,
               requests: all.requests,
             });
-            const { graph } = data.body;
-            const pr = worker.computeGraphData(graph);
-            pr.then((d: any) => {
-              setGraphDataArr(d);
-            });
           }
+          const { graph } = data.body;
+          const pr = worker.computeGraphData(graph);
+          pr.then((d: any) => {
+            setGraphDataArr(d);
+          });
         }
-        if (tableData) {
-          if (state.type === 'TABLE_FAILED') {
-            const { message }: any = tableData.data?.errorData;
-            enqueueSnackbar(`Table statistic: ${message}`);
-            loadStore.dispatch({ type: 'SET_LOAD', value: false });
-          } else if (state.type === 'TABLE_SUCCEEDED') {
-            loadStore.dispatch({ type: 'SET_LOAD', value: false });
-            const { data }: any = tableData;
-            const { table, group, desc, sort } = data.body;
-            const newLimit = data.body.limit;
-            const newRowsPerPage = newLimit * data.body.current;
-            const { length } = table;
-            if (length < newLimit) {
-              setCount(newRowsPerPage - (newLimit - length));
-              setTooltip(false);
-            } else {
-              setCount(newRowsPerPage + 1);
-              setTooltip(true);
-            }
-            _desc = desc;
-            _sort = sort;
-            setIcons(getSortIcons());
-            const pr = worker.computeTableData(table, group);
-            pr.then((d: any) => {
-              setRows(d);
-            });
+      }
+      if (tableData) {
+        if (state.type === 'TABLE_FAILED') {
+          const { message }: any = tableData.data?.errorData;
+          enqueueSnackbar(`Table statistic: ${message}`);
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+        } else if (state.type === 'TABLE_SUCCEEDED') {
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+          const { data }: any = tableData;
+          if (data?.result !== 'success') {
+            enqueueSnackbar(data?.message);
+            return 1;
           }
+          const { table, group, desc, sort } = data.body;
+          _desc = desc;
+          _sort = sort;
+          const newLimit = data.body.limit;
+          const newRowsPerPage = newLimit * data.body.current;
+          const { length } = table;
+          const pr = worker.computeTableData(table, group);
+          pr.then((d: any) => {
+            setRows(d);
+          });
+          if (length < newLimit) {
+            setCount(newRowsPerPage - (newLimit - length));
+            setTooltip(false);
+          } else {
+            setCount(newRowsPerPage + 1);
+            setTooltip(true);
+          }
+          setIcons(getSortIcons());
         }
-      });
-    }
+      }
+      return 0;
+    });
+    return () => {
+      mounted = false;
+      _storeSubs();
+      _loadStoreSubs();
+    };
   }, []);
 
   return (

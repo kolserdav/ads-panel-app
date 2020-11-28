@@ -21,7 +21,9 @@ import DashboardIcon from '@material-ui/icons/Dashboard';
 import LoginIcon from '@material-ui/icons/Input';
 import RegistrationIcon from '@material-ui/icons/PersonAdd';
 import HomeIcon from '@material-ui/icons/Home';
+import CampaignsIcon from '@material-ui/icons/LineStyle';
 import LogoutIcon from '@material-ui/icons/ExitToApp';
+import CreateIcon from '@material-ui/icons/Queue';
 import { Link, useHistory } from 'react-router-dom';
 import { LinearProgress } from '@material-ui/core';
 import { Cookies } from 'react-cookie';
@@ -210,6 +212,26 @@ export default function Panel(props: Types.PanelProps) {
                   <DashboardIcon />
                 </ListItemIcon>
                 <ListItemText primary="Dashboard" />
+              </ListItem>
+            </Link>
+          </Auth>
+          <Auth redirect={false} roles={['admin']}>
+            <Link className="menu-link" to="/campaigns">
+              <ListItem button selected={pathname === '/campaigns'}>
+                <ListItemIcon>
+                  <CampaignsIcon />
+                </ListItemIcon>
+                <ListItemText primary="Campaigns" />
+              </ListItem>
+            </Link>
+          </Auth>
+          <Auth redirect={false} roles={['user', 'admin']}>
+            <Link className="menu-link" to="/new-campaign">
+              <ListItem button selected={pathname === '/new-campaign'}>
+                <ListItemIcon>
+                  <CreateIcon />
+                </ListItemIcon>
+                <ListItemText primary="Add campaign" />
               </ListItem>
             </Link>
           </Auth>

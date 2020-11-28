@@ -16,8 +16,8 @@ import { action, loadStore, store } from '../store';
 import * as Types from '../react-app-env';
 import Auth from '../components/Auth';
 
-let _storeSubs = false;
-let _loadStoreSubs = false;
+let _storeSubs: any = () => {};
+let _loadStoreSubs: any = () => {};
 
 export default function Login() {
   const { enqueueSnackbar } = useSnackbar();
@@ -35,47 +35,45 @@ export default function Login() {
   const [alert, setAlert] = useState(_alert);
 
   useEffect(() => {
-    if (!_loadStoreSubs) {
-      _loadStoreSubs = true;
-      loadStore.subscribe(() => {
-        setLoad(loadStore.getState().value);
-      });
-    }
+    _loadStoreSubs = loadStore.subscribe(() => {
+      setLoad(loadStore.getState().value);
+    });
     // Обработчик запроса на сервер
-    if (!_storeSubs) {
-      _storeSubs = true;
-      store.subscribe(() => {
-        const state: Types.Reducer = store.getState();
-        if (state.loginData) {
-          if (state.type === 'LOGIN_FAILED') {
-            const { message }: any = state.loginData.data?.errorData;
-            enqueueSnackbar(`Login: ${message}`);
-            loadStore.dispatch({ type: 'SET_LOAD', value: false });
-          } else if (state.type === 'LOGIN_SUCCEEDED') {
-            const { data } = state.loginData;
-            const newAlert: any = {
-              open: true,
-              message: data?.message,
-              status: data?.result,
-            };
-            setAlert(newAlert);
-            if (data?.result === 'success') {
-              const { token } = data.body;
-              // Устанавливате куки с токеном
-              setCookie('_qt', token, {
-                path: '/',
-                sameSite: true,
-                expires: new Date(Date.now() + 3600 * 24 * 1000 * 90),
-              });
-              setTimeout(() => {
-                history.push('/dashboard', 'redirect');
-              }, 1000);
-            }
-            loadStore.dispatch({ type: 'SET_LOAD', value: false });
+    _storeSubs = store.subscribe(() => {
+      const state: Types.Reducer = store.getState();
+      if (state.loginData) {
+        if (state.type === 'LOGIN_FAILED') {
+          const { message }: any = state.loginData.data?.errorData;
+          enqueueSnackbar(`Login: ${message}`);
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+        } else if (state.type === 'LOGIN_SUCCEEDED') {
+          const { data } = state.loginData;
+          const newAlert: any = {
+            open: true,
+            message: data?.message,
+            status: data?.result,
+          };
+          setAlert(newAlert);
+          if (data?.result === 'success') {
+            const { token } = data.body;
+            // Устанавливате куки с токеном
+            setCookie('_qt', token, {
+              path: '/',
+              sameSite: true,
+              expires: new Date(Date.now() + 3600 * 24 * 1000 * 90),
+            });
+            setTimeout(() => {
+              history.push('/dashboard', 'redirect');
+            }, 1000);
           }
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
         }
-      });
-    }
+      }
+    });
+    return () => {
+      _storeSubs();
+      _loadStoreSubs();
+    };
   }, []);
 
   return (
