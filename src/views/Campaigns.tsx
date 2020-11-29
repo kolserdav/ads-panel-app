@@ -45,7 +45,7 @@ const DialogContent = (props: Types.DialogContentProps) => {
 
 const campaignStatuses: Types.CampaignStatus[] = ['active', 'pause', 'pending', 'budget'];
 
-export default function Campaigns() {
+export default function Statuses() {
   const { enqueueSnackbar } = useSnackbar();
   const [rows, setRows]: any = useState([]);
   const [page, setPage] = useState(0);
@@ -56,6 +56,7 @@ export default function Campaigns() {
     title: 'Dialog closed',
     content: '',
     id: 0,
+    handleAccept: () => {},
   };
   const [dialog, setDialog]: any = useState(_dialog);
   const [changed, setChanged]: any = useState(false);
@@ -66,16 +67,26 @@ export default function Campaigns() {
 
   useEffect(() => {}, []);
 
-  const changeCampaignStatus = () => {
-    loadStore.dispatch({ type: 'SET_LOAD', value: true });
-    setChanged(false);
-    action({
-      type: 'CHANGE_CAMPAIGN_STATUS_REQUESTED',
-      args: {
-        body: {
-          status: _status,
+  const changeCampaignStatus = (id: number) => {
+    return () => {
+      loadStore.dispatch({ type: 'SET_LOAD', value: true });
+      action({
+        type: 'CHANGE_CAMPAIGN_STATUS_REQUESTED',
+        args: {
+          body: {
+            status: _status,
+          },
+          id,
         },
-        id: dialog.id,
+      });
+    };
+  };
+
+  const deleteCampaign = (id: number) => {
+    action({
+      type: 'DELETE_CAMPAIGN_REQUESTED',
+      args: {
+        id,
       },
     });
   };
@@ -96,7 +107,7 @@ export default function Campaigns() {
     getCampaigns(rowsPerPage, page);
     _storeSubs = store.subscribe(() => {
       const state = store.getState();
-      const { getCampaignsData, changeCampaignStatusData } = state;
+      const { getCampaignsData, changeCampaignStatusData, deleteCampaignData } = state;
       if (getCampaignsData) {
         if (state.type === 'GET_CAMPAIGNS_FAILED') {
           const { message }: any = getCampaignsData.data?.errorData;
@@ -131,8 +142,23 @@ export default function Campaigns() {
             enqueueSnackbar(data.message);
             return 1;
           }
-          setChanged(true);
+          setChanged(!changed);
           setDialog(_dialog);
+        }
+      }
+      if (deleteCampaignData) {
+        if (state.type === 'DELETE_CAMPAIGN_FAILED') {
+          const { message }: any = deleteCampaignData.data?.errorData;
+          enqueueSnackbar(`Delete campaign: ${message}`);
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+        } else if (state.type === 'DELETE_CAMPAIGN_SUCCEEDED') {
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+          const { data }: any = deleteCampaignData;
+          enqueueSnackbar(data.message);
+          if (data.result === 'success') {
+            setDialog(_dialog);
+            setChanged(!changed);
+          }
         }
       }
       return 0;
@@ -143,7 +169,7 @@ export default function Campaigns() {
   }, [changed]);
 
   return (
-    <Auth roles={['admin']} redirect={true}>
+    <Auth roles={['admin', 'user']} redirect={true}>
       <div className="header">
         <Typography variant="h4">Campaign list</Typography>
       </div>
@@ -164,6 +190,25 @@ export default function Campaigns() {
               open: true,
               title: 'Change status of campaign',
               content: <DialogContent statusInit={statusProp} name={name} options={options} />,
+              handleAccept: changeCampaignStatus(id),
+            });
+          };
+        }}
+        handleDelete={(name: string, id: number) => {
+          return () => {
+            setDialog({
+              id,
+              open: true,
+              title: 'Delete campaign?',
+              content: (
+                <Typography variant="body1">
+                  If you click <b>Yes</b>, the campaign titled &ldquo;<i>{name}</i>&rdquo; will be
+                  deleted!
+                </Typography>
+              ),
+              handleAccept: () => {
+                deleteCampaign(id);
+              },
             });
           };
         }}
@@ -189,7 +234,7 @@ export default function Campaigns() {
         title={dialog.title}
         content={dialog.content}
         handleClose={handleCloseDialog}
-        handleAccept={changeCampaignStatus}
+        handleAccept={dialog.handleAccept}
       />
     </Auth>
   );

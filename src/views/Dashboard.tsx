@@ -93,9 +93,11 @@ let _time = 'last-month';
 let _group: Types.OrderByVariants = 'campaign';
 let _customTime: any = [];
 let _sort = _group;
-let _rowsPerPage = 10;
 let _storeSubs: any = () => {};
 let _loadStoreSubs: any = () => {};
+
+let _limit = 10;
+let _current = 1;
 
 const DashboardElement = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -123,12 +125,7 @@ const DashboardElement = () => {
   const [tooltip, setTooltip] = useState(false);
 
   // Запрос данных таблицы с учетом сортировки
-  const setSortAndDesc = (
-    sortValue: Types.OrderByVariants,
-    descValue: boolean,
-    limit: number = 10,
-    current: number = 1
-  ) => {
+  const setSortAndDesc = (sortValue: Types.OrderByVariants, descValue: boolean) => {
     action({
       type: 'TABLE_REQUESTED',
       args: {
@@ -137,8 +134,8 @@ const DashboardElement = () => {
           group: _group,
           sort: sortValue,
           desc: descValue,
-          limit,
-          current: current + 1,
+          limit: _limit,
+          current: _current,
           customTime: _customTime,
         },
       },
@@ -150,7 +147,7 @@ const DashboardElement = () => {
     action({
       type: 'TABLE_REQUESTED',
       args: {
-        body: { time, group, limit: _rowsPerPage, current: page + 1, customTime: _customTime },
+        body: { time, group, limit: _limit, current: _current, customTime: _customTime },
       },
     });
   };
@@ -337,6 +334,8 @@ const DashboardElement = () => {
           _sort = sort;
           const newLimit = data.body.limit;
           const newRowsPerPage = newLimit * data.body.current;
+          _current = data.body.current;
+          _limit = newLimit;
           const { length } = table;
           const pr = worker.computeTableData(table, group);
           pr.then((d: any) => {
@@ -423,15 +422,17 @@ const DashboardElement = () => {
           <BlockTablePagination
             handleChangePage={(event, newPage) => {
               setPage(newPage);
-              setSortAndDesc(_sort, _desc, rowsPerPage, newPage);
+              _current = newPage + 1;
+              setSortAndDesc(_sort, _desc);
             }}
             handleChangeRowsPerPage={(event) => {
               const { value }: any = event.target;
               const rPP = parseInt(value, 10);
               setRowsPerPage(rPP);
-              _rowsPerPage = rPP;
+              _limit = rPP;
+              _current = 1;
               setPage(0);
-              setSortAndDesc(_sort, _desc, value, 0);
+              setSortAndDesc(_sort, _desc);
             }}
             page={page}
             rowsPerPage={rowsPerPage}

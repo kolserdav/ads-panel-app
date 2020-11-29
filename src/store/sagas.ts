@@ -9,6 +9,8 @@ import { call, put, takeLatest } from 'redux-saga/effects';
 import Api from '../api/index';
 import * as Types from '../react-app-env';
 
+const dev = process.env.NODE_ENV === 'development';
+
 const errorData: Types.ServerResponse = {
   result: 'error',
   message: 'No internet',
@@ -26,6 +28,8 @@ function* fetchUser(action: any) {
     const data = yield call(Api.fetchUser, action);
     yield put({ type: 'USER_FETCH_SUCCEEDED', data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     yield put({ type: 'USER_FETCH_FAILED', errorData });
   }
 }
@@ -39,6 +43,8 @@ function* login(action: any) {
     const data = yield call(Api.login, action);
     yield put({ type: 'LOGIN_SUCCEEDED', data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     yield put({ type: 'LOGIN_FAILED', errorData });
   }
 }
@@ -52,6 +58,8 @@ function* register(action: any) {
     const data = yield call(Api.register, action);
     yield put({ type: 'REGISTRATION_SUCCEEDED', data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     yield put({ type: 'REGISTRATION_FAILED', errorData });
   }
 }
@@ -65,6 +73,8 @@ function* confirm(action: any) {
     const data = yield call(Api.confirm, action);
     yield put({ type: 'CONFIRM_SUCCEEDED', data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     yield put({ type: 'CONFIRM_FAILED', errorData });
   }
 }
@@ -78,6 +88,8 @@ function* getEmail(action: any) {
     const data = yield call(Api.getEmail, action);
     yield put({ type: 'EMAIL_SUCCEEDED', data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     yield put({ type: 'EMAIL_FAILED', errorData });
   }
 }
@@ -92,6 +104,8 @@ function* changePassword(action: any) {
     const type: Types.ActionTypesChangePass = 'CHANGE_PASS_SUCCEEDED';
     yield put({ type, data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     const type: Types.ActionTypesChangePass = 'CHANGE_PASS_FAILED';
     yield put({ type, errorData });
   }
@@ -107,6 +121,8 @@ function* statGraph(action: any) {
     const type: Types.ActionTypesGraph = 'GRAPH_SUCCEEDED';
     yield put({ type, data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     const type: Types.ActionTypesGraph = 'GRAPH_FAILED';
     yield put({ type, errorData });
   }
@@ -122,6 +138,8 @@ function* statTable(action: any) {
     const type: Types.ActionTypesTable = 'TABLE_SUCCEEDED';
     yield put({ type, data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     const type: Types.ActionTypesTable = 'TABLE_FAILED';
     yield put({ type, errorData });
   }
@@ -137,6 +155,8 @@ function* getCampaigns(action: any) {
     const type: Types.ActionTypesCampaignsGet = 'GET_CAMPAIGNS_SUCCEEDED';
     yield put({ type, data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     const type: Types.ActionTypesCampaignsGet = 'GET_CAMPAIGNS_FAILED';
     yield put({ type, errorData });
   }
@@ -152,6 +172,8 @@ function* changeCampaignStatus(action: any) {
     const type: Types.ActionTypesChangeCampaignStatus = 'CHANGE_CAMPAIGN_STATUS_SUCCEEDED';
     yield put({ type, data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     const type: Types.ActionTypesChangeCampaignStatus = 'CHANGE_CAMPAIGN_STATUS_FAILED';
     yield put({ type, errorData });
   }
@@ -167,6 +189,8 @@ function* createCampaign(action: any) {
     const type: Types.ActionTypesCreateCampaign = 'CREATE_CAMPAIGN_SUCCEEDED';
     yield put({ type, data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     const type: Types.ActionTypesCreateCampaign = 'CREATE_CAMPAIGN_FAILED';
     yield put({ type, errorData });
   }
@@ -182,7 +206,94 @@ function* searchCountries(action: any) {
     const type: Types.ActionTypesSearchCounrties = 'SEARCH_COUNTRIES_SUCCEEDED';
     yield put({ type, data });
   } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
     const type: Types.ActionTypesSearchCounrties = 'SEARCH_COUNTRIES_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Получение офферов
+ * @param action
+ */
+function* getOffers(action: any) {
+  try {
+    const data = yield call(Api.getOffers, action);
+    const type: Types.ActionTypesGetOffers = 'GET_OFFERS_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
+    const type: Types.ActionTypesGetOffers = 'GET_OFFERS_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Создание оффера
+ * @param action
+ */
+function* createOffer(action: any) {
+  try {
+    const data = yield call(Api.createOffer, action);
+    const type: Types.ActionTypesCreateOffer = 'CREATE_OFFER_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
+    const type: Types.ActionTypesCreateOffer = 'CREATE_OFFER_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Загрузка иконки оффера
+ * @param action
+ */
+function* uploadOfferIcon(action: any) {
+  try {
+    const data = yield call(Api.uploadIcon, action);
+    const type: Types.ActionTypesUploadOfferIcon = 'UPLOAD_OFFER_ICON_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
+    const type: Types.ActionTypesUploadOfferIcon = 'UPLOAD_OFFER_ICON_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Загрузка изображения оффера
+ * @param action
+ */
+function* uploadOfferImage(action: any) {
+  try {
+    const data = yield call(Api.uploadImage, action);
+    const type: Types.ActionTypesUploadOfferImage = 'UPLOAD_OFFER_IMAGE_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
+    const type: Types.ActionTypesUploadOfferImage = 'UPLOAD_OFFER_IMAGE_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Удаление кампании
+ * @param action
+ */
+function* deleteCampaign(action: any) {
+  try {
+    const data = yield call(Api.deleteCampaign, action);
+    const type: Types.ActionTypesDeleteCampaign = 'DELETE_CAMPAIGN_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
+    const type: Types.ActionTypesDeleteCampaign = 'DELETE_CAMPAIGN_FAILED';
     yield put({ type, errorData });
   }
 }
@@ -278,4 +389,44 @@ export function* createCampaignSaga() {
 export function* searchCountriesSaga() {
   const type: Types.ActionTypesSearchCounrties = 'SEARCH_COUNTRIES_REQUESTED';
   yield takeLatest(type, searchCountries);
+}
+
+/**
+ * Прослушиватель задачи получения офферов
+ */
+export function* getOffersSaga() {
+  const type: Types.ActionTypesGetOffers = 'GET_OFFERS_REQUESTED';
+  yield takeLatest(type, getOffers);
+}
+
+/**
+ * Прослушиватель задачи создания оффера
+ */
+export function* createOfferSaga() {
+  const type: Types.ActionTypesCreateOffer = 'CREATE_OFFER_REQUESTED';
+  yield takeLatest(type, createOffer);
+}
+
+/**
+ * Прослушиватель задачи загрузки иконки оффера
+ */
+export function* uploadOfferIconSaga() {
+  const type: Types.ActionTypesUploadOfferIcon = 'UPLOAD_OFFER_ICON_REQUESTED';
+  yield takeLatest(type, uploadOfferIcon);
+}
+
+/**
+ * Прослушиватель задачи загрузки изображения оффера
+ */
+export function* uploadOfferImageSaga() {
+  const type: Types.ActionTypesUploadOfferImage = 'UPLOAD_OFFER_IMAGE_REQUESTED';
+  yield takeLatest(type, uploadOfferImage);
+}
+
+/**
+ * Прослушиватель задачи удаления кампании
+ */
+export function* deleteCampaignSaga() {
+  const type: Types.ActionTypesDeleteCampaign = 'DELETE_CAMPAIGN_REQUESTED';
+  yield takeLatest(type, deleteCampaign);
 }

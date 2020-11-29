@@ -23,6 +23,11 @@ import {
   changeCampaignStatusSaga,
   createCampaignSaga,
   searchCountriesSaga,
+  getOffersSaga,
+  createOfferSaga,
+  uploadOfferIconSaga,
+  uploadOfferImageSaga,
+  deleteCampaignSaga,
 } from './sagas';
 
 const sagaMiddleware = createSagaMiddleware();
@@ -40,6 +45,11 @@ sagaMiddleware.run(getCampaignsSaga);
 sagaMiddleware.run(changeCampaignStatusSaga);
 sagaMiddleware.run(createCampaignSaga);
 sagaMiddleware.run(searchCountriesSaga);
+sagaMiddleware.run(getOffersSaga);
+sagaMiddleware.run(createOfferSaga);
+sagaMiddleware.run(uploadOfferIconSaga);
+sagaMiddleware.run(uploadOfferImageSaga);
+sagaMiddleware.run(deleteCampaignSaga);
 
 /**
  * Задает и экспортирует метод вызова саги

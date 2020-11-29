@@ -109,7 +109,7 @@ function App(props: any) {
           <Route path="/change-user-pwd">
             <ChangePassword />
           </Route>
-          <Route path="/campaigns">
+          <Route path="/Campaigns">
             <Campaigns />
           </Route>
           <Route path="/new-campaign">

@@ -426,6 +426,171 @@ export default function appReducer(state = initialState, action: Types.Action): 
           data: action,
         },
       });
+    /**
+     * Получение офферов
+     */
+    case 'GET_OFFERS_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        getOffersData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'GET_OFFERS_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        getOffersData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'GET_OFFERS_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        getOffersData: {
+          type: action.type,
+          data: action,
+        },
+      });
+    /**
+     * Создание оффера
+     */
+    case 'CREATE_OFFER_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        createOfferData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'CREATE_OFFER_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        createOfferData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'CREATE_OFFER_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        createOfferData: {
+          type: action.type,
+          data: action,
+        },
+      });
+    /**
+     * Загрузка иконки оффера
+     */
+    case 'UPLOAD_OFFER_ICON_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        uploadOfferIconData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'UPLOAD_OFFER_ICON_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        uploadOfferIconData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'UPLOAD_OFFER_ICON_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        uploadOfferIconData: {
+          type: action.type,
+          data: action,
+        },
+      });
+    /**
+     * Загрузка изображения оффера
+     */
+    case 'UPLOAD_OFFER_IMAGE_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        uploadOfferImageData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'UPLOAD_OFFER_IMAGE_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        uploadOfferImageData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'UPLOAD_OFFER_IMAGE_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        uploadOfferImageData: {
+          type: action.type,
+          data: action,
+        },
+      });
+    /**
+     * Удаление кампании
+     */
+    case 'DELETE_CAMPAIGN_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        deleteCampaignData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'DELETE_CAMPAIGN_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        deleteCampaignData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'DELETE_CAMPAIGN_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        deleteCampaignData: {
+          type: action.type,
+          data: action,
+        },
+      });
     default:
       return state;
   }

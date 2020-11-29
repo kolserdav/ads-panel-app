@@ -1,4 +1,5 @@
 import request from './request';
+import requestMultipart from './requestMultipart';
 
 /**
  * Все методы Api получают следующие параметры
@@ -125,6 +126,56 @@ const Api = {
     // eslint-disable-next-line no-unused-vars
     fn: (context: any, ...args: any[]): any => {
       return request('/countries', 'GET', context.args.params);
+    },
+  },
+  /**
+   * Получение офферов
+   */
+  getOffers: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request('/offer/get', 'POST', context.args.body);
+    },
+  },
+  /**
+   * Создание оффера
+   */
+  createOffer: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request('/offer', 'POST', context.args.body);
+    },
+  },
+  /**
+   * Изменение/добавление иконки оффера
+   */
+  uploadIcon: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return requestMultipart(`/offer/icon/${context.args.id}`, context.args.body);
+    },
+  },
+  /**
+   * Изменение/добавление изображения оффера
+   */
+  uploadImage: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return requestMultipart(`/offer/image/${context.args.id}`, context.args.body);
+    },
+  },
+  /**
+   * Изменение/добавление изображения оффера
+   */
+  deleteCampaign: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request(`/campaign/${context.args.id}`, 'DELETE');
     },
   },
 };

@@ -86,10 +86,20 @@ export function computeTableData(data: any[], groupBy: Types.GroupBy): Types.Tab
 export function computeAdminCampaignsData(data: any[]): Types.TableCampaignsRow[] {
   return data.map((item: any) => {
     return {
+      userId: item.user_id,
       id: item.id,
       title: item.title,
       status: item.status,
       owner: `${item.first_name} ${item.last_name}`,
+      price: item.price,
+      budget: item.budget,
+      countries: item.countries ? JSON.parse(item.countries) : [],
+      blackList: item.black_list ? JSON.parse(item.black_list) : [],
+      whiteList: item.white_list ? JSON.parse(item.white_list) : [],
+      ipPattern: item.ip_pattern ? JSON.parse(item.ip_pattern) : [],
+      created: getDate(item.created, 'DD-MM-YYYY hh:mm'),
+      updated: getDate(item.updated, 'DD-MM-YYYY hh:mm'),
+      offer: item.offer,
     };
   });
 }

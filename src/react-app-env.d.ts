@@ -19,10 +19,11 @@ export type DialogState = {
   open: boolean
   title: string
   content: string | React.ReactElement
+  handleAccept: (e: any) => void
 }
 
 export type AlertProps = {
-  status: 'error' | 'succes' | 'warning' | 'info'
+  status: 'error' | 'success' | 'warning' | 'info'
   message: string
   open?: boolean
 }
@@ -59,11 +60,42 @@ export type ActionTypesCampaignsGet = 'GET_CAMPAIGNS_REQUESTED' | 'GET_CAMPAIGNS
 export type ActionTypesChangeCampaignStatus = 'CHANGE_CAMPAIGN_STATUS_REQUESTED' | 'CHANGE_CAMPAIGN_STATUS_SUCCEEDED' | 'CHANGE_CAMPAIGN_STATUS_FAILED';
 export type ActionTypesCreateCampaign = 'CREATE_CAMPAIGN_REQUESTED' | 'CREATE_CAMPAIGN_SUCCEEDED' | 'CREATE_CAMPAIGN_FAILED';
 export type ActionTypesSearchCounrties = 'SEARCH_COUNTRIES_REQUESTED' | 'SEARCH_COUNTRIES_SUCCEEDED' | 'SEARCH_COUNTRIES_FAILED';
+export type ActionTypesGetOffers = 'GET_OFFERS_REQUESTED' | 'GET_OFFERS_SUCCEEDED' | 'GET_OFFERS_FAILED';
+export type ActionTypesCreateOffer = 'CREATE_OFFER_REQUESTED' | 'CREATE_OFFER_SUCCEEDED' | 'CREATE_OFFER_FAILED';
+export type ActionTypesUploadOfferIcon = 'UPLOAD_OFFER_ICON_REQUESTED' | 'UPLOAD_OFFER_ICON_SUCCEEDED' | 'UPLOAD_OFFER_ICON_FAILED';
+export type ActionTypesUploadOfferImage = 'UPLOAD_OFFER_IMAGE_REQUESTED' | 'UPLOAD_OFFER_IMAGE_SUCCEEDED' | 'UPLOAD_OFFER_IMAGE_FAILED';
+export type ActionTypesDeleteCampaign = 'DELETE_CAMPAIGN_REQUESTED' | 'DELETE_CAMPAIGN_SUCCEEDED' | 'DELETE_CAMPAIGN_FAILED';
 
 export type ActionTypes = 'INITIAL_TYPE' | ActionTypesUser | ActionTypesLogin |
  ActionTypesRegistration | ActionTypesConfirm | ActionTypesEmail | ActionTypesChangePass | 
  ActionTypesGraph | ActionTypesTable | ActionTypesCampaignsGet | ActionTypesChangeCampaignStatus | 
- ActionTypesCreateCampaign | ActionTypesSearchCounrties;
+ ActionTypesCreateCampaign | ActionTypesSearchCounrties | ActionTypesGetOffers |
+ ActionTypesCreateOffer | ActionTypesUploadOfferIcon | ActionTypesUploadOfferImage | 
+ ActionTypesDeleteCampaign;
+
+// Редьюсеры проверяют типы толко в компонентах, до store/reducers.ts почему-то не дотягивается
+export type Reducer = {
+  type: ActionTypes
+  data?: Action 
+  initialData?: action
+  userData?: Action
+  loginData?: Action
+  registerData?: Action
+  confirmData?: Action
+  emailData?: Action
+  passData?: Action
+  graphData?: Action
+  tableData?: Action
+  getCampaignsData?: Action
+  changeCampaignStatusData?: Action
+  createCampaignData?: Action
+  searchCountriesData?: Action
+  getOffersData?: Action
+  createOfferData?: Action
+  uploadOfferIconData?: Action
+  uploadOfferImageData?: Action
+  deleteCampaignData?: Action
+}
 
 export type TableStatistic = {
   date: Date
@@ -175,25 +207,6 @@ export type Action = {
   }
 };
 
-// Редьюсеры проверяют типы толко в компонентах, до store/reducers.ts почему-то не дотягивается
-export type Reducer = {
-  type: ActionTypes
-  data?: Action 
-  initialData?: action
-  userData?: Action
-  loginData?: Action
-  registerData?: Action
-  confirmData?: Action
-  emailData?: Action
-  passData?: Action
-  graphData?: Action
-  tableData?: Action
-  getCampaignsData?: Action
-  changeCampaignStatusData?: Action
-  createCampaignData?: Action
-  searchCountriesData?: Action
-}
-
 export type GraphProps = {
   data: GraphData[]
 }
@@ -286,6 +299,7 @@ export type CampaignStatus = 'active' | 'pause' | 'pending' | 'budget';
 export type TableCampaignsProps = {
   rows: TableCampaignsRow[]
   handleChangeStatus: (status: CampaignStatus, name: string, id: number) => (e: MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  handleDelete: (name: string, id: number) => (e: MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }
 
 export type TableCampaignsRow = {
@@ -293,7 +307,19 @@ export type TableCampaignsRow = {
   status: CampaignStatus
   owner: string
   id: number
+  price: number
+  budget: number
+  countries: string[]
+  offer: string
+  ipPattern: string[]
+  whiteList: string[]
+  blackList: string[]
+  created: string
+  updated: string
+  userId: number
 }
+
+export type DialogOperations = 'status' | 'change' | 'delete'
 
 export type DialogContentProps = {
   statusInit: CampaignStatus

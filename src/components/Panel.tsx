@@ -17,11 +17,12 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import Slide from '@material-ui/core/Slide';
-import DashboardIcon from '@material-ui/icons/Dashboard';
+import DashboardIcon from '@material-ui/icons/ShowChart';
 import LoginIcon from '@material-ui/icons/Input';
 import RegistrationIcon from '@material-ui/icons/PersonAdd';
 import HomeIcon from '@material-ui/icons/Home';
 import CampaignsIcon from '@material-ui/icons/LineStyle';
+import StatusesIcon from '@material-ui/icons/VerifiedUser';
 import LogoutIcon from '@material-ui/icons/ExitToApp';
 import CreateIcon from '@material-ui/icons/Queue';
 import { Link, useHistory } from 'react-router-dom';
@@ -195,6 +196,19 @@ export default function Panel(props: Types.PanelProps) {
         </div>
         <Divider />
         <List>
+          <Auth redirect={false} roles={['admin', 'user']}>
+            <Link className="menu-link" to="/dashboard">
+              <ListItem button selected={pathname === '/dashboard'}>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItem>
+            </Link>
+          </Auth>
+        </List>
+        <Divider />
+        <List>
           <Auth redirect={false} roles={['guest']}>
             <Link className="menu-link" to="/">
               <ListItem button selected={pathname === '/'}>
@@ -206,16 +220,6 @@ export default function Panel(props: Types.PanelProps) {
             </Link>
           </Auth>
           <Auth redirect={false} roles={['admin', 'user']}>
-            <Link className="menu-link" to="/dashboard">
-              <ListItem button selected={pathname === '/dashboard'}>
-                <ListItemIcon>
-                  <DashboardIcon />
-                </ListItemIcon>
-                <ListItemText primary="Dashboard" />
-              </ListItem>
-            </Link>
-          </Auth>
-          <Auth redirect={false} roles={['admin']}>
             <Link className="menu-link" to="/campaigns">
               <ListItem button selected={pathname === '/campaigns'}>
                 <ListItemIcon>

@@ -122,3 +122,13 @@
   max-height: 60vh;
   overflow: auto;
 }
+
+.margin-4 {
+  margin: 4px;
+}
+
+.wrap-center {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
