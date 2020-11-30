@@ -298,6 +298,57 @@ function* deleteCampaign(action: any) {
   }
 }
 
+/**
+ * Получение кампании
+ * @param action
+ */
+function* getCampaign(action: any) {
+  try {
+    const data = yield call(Api.getCampaign, action);
+    const type: Types.ActionTypesGetCampaign = 'GET_CAMPAIGN_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
+    const type: Types.ActionTypesGetCampaign = 'GET_CAMPAIGN_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Изменение оффера
+ * @param action
+ */
+function* updateOffer(action: any) {
+  try {
+    const data = yield call(Api.updateOffer, action);
+    const type: Types.ActionTypesUpdateOffer = 'UPDATE_OFFER_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
+    const type: Types.ActionTypesUpdateOffer = 'UPDATE_OFFER_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Изменение кампании
+ * @param action
+ */
+function* updateCampaign(action: any) {
+  try {
+    const data = yield call(Api.updateCampaign, action);
+    const type: Types.ActionTypesUpdateCampaign = 'UPDATE_CAMPAIGN_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
+    const type: Types.ActionTypesUpdateCampaign = 'UPDATE_CAMPAIGN_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
 // Прослушиватели задач
 
 /**
@@ -429,4 +480,28 @@ export function* uploadOfferImageSaga() {
 export function* deleteCampaignSaga() {
   const type: Types.ActionTypesDeleteCampaign = 'DELETE_CAMPAIGN_REQUESTED';
   yield takeLatest(type, deleteCampaign);
+}
+
+/**
+ * Прослушиватель задачи получения кампании
+ */
+export function* getCampaignSaga() {
+  const type: Types.ActionTypesGetCampaign = 'GET_CAMPAIGN_REQUESTED';
+  yield takeLatest(type, getCampaign);
+}
+
+/**
+ * Прослушиватель задачи изменение оффера
+ */
+export function* updateOfferSaga() {
+  const type: Types.ActionTypesUpdateOffer = 'UPDATE_OFFER_REQUESTED';
+  yield takeLatest(type, updateOffer);
+}
+
+/**
+ * Прослушиватель задачи изменение кампании
+ */
+export function* updateCampaignSaga() {
+  const type: Types.ActionTypesUpdateCampaign = 'UPDATE_CAMPAIGN_REQUESTED';
+  yield takeLatest(type, updateCampaign);
 }

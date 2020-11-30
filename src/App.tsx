@@ -115,6 +115,9 @@ function App(props: any) {
           <Route path="/new-campaign">
             <CreateCampaign />
           </Route>
+          <Route path="/update-campaign/:id">
+            <CreateCampaign update={true} />
+          </Route>
           <Route path="/">{pathname === '/' ? <Home /> : <Page404 />}</Route>
         </Switch>
       </Panel>

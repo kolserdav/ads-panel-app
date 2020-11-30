@@ -33,3 +33,12 @@ export function stringifyQuery(params: any): string {
   });
   return query.replace(/&$/, '');
 }
+
+/**
+ * Получение url сервера
+ */
+export function getServerUrl(): string {
+  const { REACT_APP_SERVER_URL, REACT_APP_SERVER_URL_LOCAL, NODE_ENV }: any = process.env;
+  const dev = NODE_ENV === 'development';
+  return dev ? REACT_APP_SERVER_URL_LOCAL : REACT_APP_SERVER_URL;
+}

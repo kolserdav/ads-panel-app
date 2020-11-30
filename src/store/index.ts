@@ -28,6 +28,9 @@ import {
   uploadOfferIconSaga,
   uploadOfferImageSaga,
   deleteCampaignSaga,
+  getCampaignSaga,
+  updateOfferSaga,
+  updateCampaignSaga,
 } from './sagas';
 
 const sagaMiddleware = createSagaMiddleware();
@@ -50,6 +53,9 @@ sagaMiddleware.run(createOfferSaga);
 sagaMiddleware.run(uploadOfferIconSaga);
 sagaMiddleware.run(uploadOfferImageSaga);
 sagaMiddleware.run(deleteCampaignSaga);
+sagaMiddleware.run(getCampaignSaga);
+sagaMiddleware.run(updateOfferSaga);
+sagaMiddleware.run(updateCampaignSaga);
 
 /**
  * Задает и экспортирует метод вызова саги

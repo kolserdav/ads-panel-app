@@ -178,6 +178,36 @@ const Api = {
       return request(`/campaign/${context.args.id}`, 'DELETE');
     },
   },
+  /**
+   * Получение кампании по ид
+   */
+  getCampaign: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request(`/campaign/${context.args.id}`, 'GET');
+    },
+  },
+  /**
+   * Изменение оффера
+   */
+  updateOffer: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request(`/offer/${context.args.id}`, 'PUT', context.args.body);
+    },
+  },
+  /**
+   * Изменение кампании
+   */
+  updateCampaign: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request(`/campaign/${context.args.id}`, 'PUT', context.args.body);
+    },
+  },
 };
 
 export default Api;

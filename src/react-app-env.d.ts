@@ -1,5 +1,8 @@
 /// <reference types="react-scripts" />
 
+import React from 'react';
+import { Theme } from '@material-ui/core';
+
 export type PanelProps = {
   children: React.ReactElement
   window: () => Window
@@ -65,13 +68,28 @@ export type ActionTypesCreateOffer = 'CREATE_OFFER_REQUESTED' | 'CREATE_OFFER_SU
 export type ActionTypesUploadOfferIcon = 'UPLOAD_OFFER_ICON_REQUESTED' | 'UPLOAD_OFFER_ICON_SUCCEEDED' | 'UPLOAD_OFFER_ICON_FAILED';
 export type ActionTypesUploadOfferImage = 'UPLOAD_OFFER_IMAGE_REQUESTED' | 'UPLOAD_OFFER_IMAGE_SUCCEEDED' | 'UPLOAD_OFFER_IMAGE_FAILED';
 export type ActionTypesDeleteCampaign = 'DELETE_CAMPAIGN_REQUESTED' | 'DELETE_CAMPAIGN_SUCCEEDED' | 'DELETE_CAMPAIGN_FAILED';
+export type ActionTypesGetCampaign = 'GET_CAMPAIGN_REQUESTED' | 'GET_CAMPAIGN_SUCCEEDED' | 'GET_CAMPAIGN_FAILED';
+export type ActionTypesUpdateOffer = 'UPDATE_OFFER_REQUESTED' | 'UPDATE_OFFER_SUCCEEDED' | 'UPDATE_OFFER_FAILED';
+export type ActionTypesUpdateCampaign = 'UPDATE_CAMPAIGN_REQUESTED' | 'UPDATE_CAMPAIGN_SUCCEEDED' | 'UPDATE_CAMPAIGN_FAILED';
 
 export type ActionTypes = 'INITIAL_TYPE' | ActionTypesUser | ActionTypesLogin |
  ActionTypesRegistration | ActionTypesConfirm | ActionTypesEmail | ActionTypesChangePass | 
  ActionTypesGraph | ActionTypesTable | ActionTypesCampaignsGet | ActionTypesChangeCampaignStatus | 
  ActionTypesCreateCampaign | ActionTypesSearchCounrties | ActionTypesGetOffers |
  ActionTypesCreateOffer | ActionTypesUploadOfferIcon | ActionTypesUploadOfferImage | 
- ActionTypesDeleteCampaign;
+ ActionTypesDeleteCampaign | ActionTypesGetCampaign | ActionTypesUpdateOffer | 
+ ActionTypesUpdateCampaign;
+
+ export type Action = {
+  type: ActionTypes
+  data?: ServerResponse
+  args? : {
+    token?: string
+    body?: any
+    params?: any
+    id?: number
+  }
+};
 
 // Редьюсеры проверяют типы толко в компонентах, до store/reducers.ts почему-то не дотягивается
 export type Reducer = {
@@ -95,6 +113,9 @@ export type Reducer = {
   uploadOfferIconData?: Action
   uploadOfferImageData?: Action
   deleteCampaignData?: Action
+  getCampaignData?: Action
+  updateOfferData?: Action
+  updateCampaignData?: Action
 }
 
 export type TableStatistic = {
@@ -195,17 +216,6 @@ export type ServerResponse = {
   },
   errorData?: ServerResponse
 }
-
-export type Action = {
-  type: ActionTypes
-  data?: ServerResponse
-  args? : {
-    token?: string
-    body?: any
-    params?: any
-    id?: number
-  }
-};
 
 export type GraphProps = {
   data: GraphData[]
@@ -309,6 +319,7 @@ export type TableCampaignsRow = {
   id: number
   price: number
   budget: number
+  offerArchive: '1' | '0'
   countries: string[]
   offer: string
   ipPattern: string[]
@@ -331,3 +342,26 @@ export type PopperProps = {
   anchorEl: null | HTMLElement
   content: ReactElement<any, any>
 }
+
+export type Alignment = 'add' | 'new';
+
+export type OfferIcon = any
+export type OfferImage = any
+
+export type OfferUpdateProps = {
+  offerId?: number
+  offerTitle: string
+  setOfferTitle: React.Dispatch<string>
+  offerDescription: string
+  setOfferDescription: React.Dispatch<string>
+  classes: any
+  offerIcon: any
+  setOfferIcon: React.Dispatch<any> 
+  offerImage: any
+  setOfferImage: React.Dispatch<any> 
+}
+
+export type CreateCampaignProps = {
+  update?: boolean
+}
+

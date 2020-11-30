@@ -90,6 +90,7 @@ export function computeAdminCampaignsData(data: any[]): Types.TableCampaignsRow[
       id: item.id,
       title: item.title,
       status: item.status,
+      offerArchive: item.offer_archive,
       owner: `${item.first_name} ${item.last_name}`,
       price: item.price,
       budget: item.budget,

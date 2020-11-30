@@ -1,4 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+/**
+ * Создание кампании/оффера и их изменение
+ * в зависимости от контекста вызова
+ */
+import React, { useState, useEffect } from 'react';
 import {
   Typography,
   TextField,
@@ -16,9 +20,10 @@ import {
   Card,
   CardContent,
 } from '@material-ui/core';
-import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
+import { ToggleButton, ToggleButtonGroup, Skeleton } from '@material-ui/lab';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
+import { useHistory } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -28,11 +33,17 @@ import AlertMessage from '../components/AlertMessage';
 import BlockPopper from '../components/BlockPopper';
 import BlockSelect from '../components/BlockSelect';
 import { action, loadStore, store } from '../store';
+import * as lib from '../lib';
 import * as Types from '../react-app-env';
 import Auth from '../components/Auth';
 
+// Для формирования ссылки изображения
+const serverUrl = lib.getServerUrl();
+
+// Для получения файлов из скрытых форм иконки и изображения
 const body: any = document.querySelector('body');
 
+// Ширина контейнера формы и расчет ширины textarea
 const minWidth = body.clientWidth > 500 ? 500 : 300;
 
 const useStyles = makeStyles({
@@ -51,28 +62,266 @@ const ipReg = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01
 // eslint-disable-next-line no-useless-escape
 const urlReg = /^https?:\/\//;
 
+const getOfferImagePath = (offerId: any): string => {
+  return `/img/offers/${offerId}/`;
+};
+
 // Ограничители подписок, чтобы по нескольку раз не подписывалось на одно и тоже хранилище
 let _storeSubs: any = () => {};
 let _loadStoreSubs: any = () => {};
+let _alignment: Types.Alignment = 'add';
+let _offerIcon: Types.OfferIcon = {};
+let _offerImage: Types.OfferImage = {};
 
-export default function CreateCampaign() {
-  const iconRef = useRef<HTMLInputElement>(null);
-  const imageRef = useRef<HTMLInputElement>(null);
-  const classes = useStyles();
+// Блок обновления и создания оффера
+const OfferUpdate = (props: Types.OfferUpdateProps) => {
+  const {
+    offerTitle,
+    setOfferTitle,
+    offerDescription,
+    setOfferDescription,
+    classes,
+    offerId,
+    offerIcon,
+    offerImage,
+    setOfferIcon,
+    setOfferImage,
+  } = props;
+
+  const title = _alignment === 'new' ? 'Create new offer' : 'Update offer';
+
+  useEffect(() => {}, [offerId]);
+
+  const fullIconName = `${getOfferImagePath(offerId)}/${offerIcon.name}`;
+  const fullImageName = `${getOfferImagePath(offerId)}/${offerImage.name}`;
+
+  return (
+    <div>
+      <div className={clsx('col-center')}>
+        <Typography variant="h6">{title}</Typography>
+      </div>
+      <br />
+      <div className="col-center">
+        <FormLabel>Title</FormLabel>
+      </div>
+      <div className={clsx('form-item')}>
+        <TextField
+          fullWidth
+          defaultValue={offerTitle}
+          onChange={(e: any) => {
+            const { value }: any = e.target;
+            setOfferTitle(value);
+          }}
+          type="text"
+          variant="outlined"
+          placeholder="offer title"
+        />
+      </div>
+      <div className="col-center">
+        <FormLabel>Description</FormLabel>
+      </div>
+      <div className={clsx('form-item', 'col-center')}>
+        <TextareaAutosize
+          value={offerDescription}
+          onChange={(e: any) => {
+            const { value } = e.target;
+            setOfferDescription(value);
+          }}
+          aria-label="minimum height"
+          rowsMin={3}
+          cols={minWidth / 10}
+          placeholder="Offer description"
+        />
+      </div>
+      <div className={clsx('col-center', 'header')}>
+        <FormLabel>Offer media</FormLabel>
+      </div>
+      <div className={clsx('form-input', 'row')}>
+        <Card className={classes.card} variant="outlined">
+          <CardContent>
+            <Typography variant="h6">Insert icon</Typography>
+            <Typography variant="body1">Accepted all image types</Typography>
+            <div className="row-center">
+              <FormLabel>Upload:</FormLabel>
+              <IconButton
+                onClick={() => {
+                  const d: any = document.getElementById(`icon-${_alignment}`);
+                  d.firstChild.click();
+                }}>
+                <UploadIcon color="secondary" />
+              </IconButton>
+            </div>
+            {_offerIcon.name ? (
+              <div>
+                {_alignment === 'new' ? (
+                  <Paper className={classes.padding}>
+                    {offerIcon.name}
+                    <IconButton
+                      onClick={() => {
+                        _offerIcon = {};
+                        setOfferIcon(_offerIcon);
+                      }}>
+                      <DeleteIcon color="error" />
+                    </IconButton>
+                  </Paper>
+                ) : (
+                  <div className="col-center">
+                    <img
+                      title={offerIcon.name}
+                      width={minWidth / 2 - 32}
+                      alt={offerIcon.name}
+                      src={`${serverUrl}${
+                        offerIcon.name.match(/^\/img/) ? offerIcon.name : fullIconName
+                      }`}
+                    />
+                    <IconButton
+                      onClick={() => {
+                        _offerIcon = {};
+                        setOfferIcon(_offerIcon);
+                      }}>
+                      <DeleteIcon color="error" />
+                    </IconButton>
+                  </div>
+                )}
+              </div>
+            ) : (
+              ''
+            )}
+          </CardContent>
+        </Card>
+        <Card className={classes.card} variant="outlined">
+          <CardContent>
+            <Typography variant="h6">Insert image</Typography>
+            <Typography variant="body1">Accepted all image types</Typography>
+            <div className="row-center">
+              <FormLabel>Upload:</FormLabel>
+              <IconButton
+                onClick={() => {
+                  const d: any = document.getElementById(`image-${_alignment}`);
+                  d.firstChild.click();
+                }}>
+                <UploadIcon color="secondary" />
+              </IconButton>
+            </div>
+            {offerImage.name ? (
+              <div>
+                {_alignment === 'new' ? (
+                  <Paper className={classes.padding}>
+                    {offerImage.name}
+                    <IconButton
+                      onClick={() => {
+                        _offerImage = {};
+                        setOfferImage(_offerImage);
+                      }}>
+                      <DeleteIcon color="error" />
+                    </IconButton>
+                  </Paper>
+                ) : (
+                  <div className="col-center">
+                    <img
+                      title={offerImage.name}
+                      width={minWidth / 2 - 32}
+                      alt={offerImage.name}
+                      src={`${serverUrl}${
+                        offerImage.name.match(/^\/img/) ? offerImage.name : fullImageName
+                      }`}
+                    />
+                    <IconButton
+                      onClick={() => {
+                        _offerImage = {};
+                        setOfferImage(_offerImage);
+                      }}>
+                      <DeleteIcon color="error" />
+                    </IconButton>
+                  </div>
+                )}
+              </div>
+            ) : (
+              ''
+            )}
+          </CardContent>
+        </Card>
+      </div>
+      <div className="form-input">
+        <form id={`icon-${_alignment}`}>
+          <input
+            name="icon"
+            onChange={(e: any) => {
+              const { files } = e.target;
+              if (files) {
+                // eslint-disable-next-line prefer-destructuring
+                _offerIcon.name = files[0].name;
+                setOfferIcon(files[0]);
+              }
+            }}
+            accept="image/*"
+            hidden
+            type="file"
+          />
+        </form>
+        <form id={`image-${_alignment}`}>
+          <input
+            name="image"
+            onChange={(e: any) => {
+              const { files } = e.target;
+              if (files) {
+                // eslint-disable-next-line prefer-destructuring
+                _offerImage.name = files[0].name;
+                setOfferImage(files[0]);
+              }
+            }}
+            accept="image/*"
+            hidden
+            type="file"
+          />
+        </form>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Сборщик мусора не пропускает стейты которые не задействованы в рендере,
+ * поэтому для изменения и создания камнании updateCampaign и createCampaign пришлось устроить эти пляски с замыканиями(
+ */
+const _campaign = {
+  title: '',
+  link: '',
+  countries: [],
+  budget: 0,
+  price: 0,
+  ip_pattern: [],
+  white_list: [],
+  black_list: [],
+  offer_id: -1,
+};
+
+let _oldCountries: any[] = [];
+let _id: number = 0;
+let _cleared = false;
+
+/**
+ * Основной компонент представлений изменения и создания кампании с изменением
+ * и созданием оффера.
+ * @param props
+ */
+export default function CreateCampaign(props: Types.CreateCampaignProps) {
+  const { update } = props;
+  const history: any = useHistory();
+  const classes: any = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-  // eslint-disable-next-line no-unused-vars
   const [offer, setOffer] = useState<number>(-1);
+  const [offersOptions, setOffersOptions] = useState<React.ReactElement[]>([]);
+  const [title, setTitle] = useState<string>('');
   const [offerIcon, setOfferIcon] = useState<any>({});
   const [offerImage, setOfferImage] = useState<any>({});
-  const [offersOptions, setOffersOptions] = useState<React.ReactElement[]>([]);
-  const [title, setTitle] = useState();
   const [offerTitle, setOfferTitle] = useState<string>('');
   const [offerDescription, setOfferDescription] = useState<string>('');
   const [link, setLink] = useState('http://');
   const [countryList, setCountryList] = useState<Types.Country[]>([]);
   const [countries, setCountries] = useState(<div> </div>);
-  const [budget, setBudget] = useState<number>();
-  const [price, setPrice] = useState<number>();
+  const [budget, setBudget] = useState<number>(0);
+  const [price, setPrice] = useState<number>(0);
   const [ips, setIps] = useState<string[]>([]);
   const [whiteList, setWhiteList] = useState<string[]>([]);
   const [blackList, setBlackList] = useState<string[]>([]);
@@ -93,6 +342,7 @@ export default function CreateCampaign() {
   };
   const [alert, setAlert] = useState(_alert);
 
+  // Запрос списка стран при клике или изменению поля стран
   const changeCountries = (e: any) => {
     setAnchorEl(e.currentTarget);
     action({
@@ -105,9 +355,11 @@ export default function CreateCampaign() {
     });
   };
 
-  const handleAlignment = (event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => {
+  // Управляет переключателем создания/редактирования оффера
+  const handleAlignment = (event: React.MouseEvent<HTMLElement>, newAlignment: any) => {
     if (newAlignment !== null) {
-      setAlignment(newAlignment);
+      _alignment = newAlignment;
+      setAlignment(_alignment);
     }
   };
 
@@ -116,17 +368,7 @@ export default function CreateCampaign() {
     action({
       type: 'CREATE_CAMPAIGN_REQUESTED',
       args: {
-        body: {
-          title,
-          link,
-          countries: countryList.map((item: any) => item.code),
-          budget,
-          price,
-          ip_pattern: ips,
-          white_list: whiteList,
-          black_list: blackList,
-          offer_id: offer,
-        },
+        body: _campaign,
       },
     });
   };
@@ -149,6 +391,76 @@ export default function CreateCampaign() {
     });
   };
 
+  const updateCampaign = () => {
+    setAlert({
+      open: true,
+      status: 'info',
+      message: 'Campaign update...',
+    });
+    loadStore.dispatch({ type: 'SET_LOAD', value: true });
+    action({
+      type: 'UPDATE_CAMPAIGN_REQUESTED',
+      args: {
+        id: _id,
+        body: _campaign,
+      },
+    });
+  };
+
+  const updateOffer = () => {
+    setAlert({
+      open: true,
+      status: 'info',
+      message: 'Offer updated...',
+    });
+    loadStore.dispatch({ type: 'SET_LOAD', value: true });
+    action({
+      type: 'UPDATE_OFFER_REQUESTED',
+      args: {
+        id: offer,
+        body: {
+          title: offerTitle,
+          description: offerDescription,
+        },
+      },
+    });
+  };
+
+  /**
+   * Шлет запрос на сервер для обновления изображения оффера
+   * @param id {number} - ид оффера
+   */
+  const updateOfferImage = (id: number) => {
+    const formImage: any = document.getElementById(`image-${_alignment}`);
+    const formDataImage = new FormData(formImage);
+    action({
+      type: 'UPLOAD_OFFER_IMAGE_REQUESTED',
+      args: {
+        id,
+        body: formDataImage,
+      },
+    });
+  };
+
+  /**
+   * Шлет запрос на сервер для обновления иконки оффера
+   * @param id {number}
+   */
+  const updateOfferIcon = (id: number) => {
+    const formIcon: any = document.getElementById(`icon-${_alignment}`);
+    const formDataIcon = new FormData(formIcon);
+    action({
+      type: 'UPLOAD_OFFER_ICON_REQUESTED',
+      args: {
+        id,
+        body: formDataIcon,
+      },
+    });
+  };
+
+  /**
+   * Запрашивает у сервера офферы пользователя
+   */
   const getOffers = () => {
     action({
       type: 'GET_OFFERS_REQUESTED',
@@ -160,12 +472,47 @@ export default function CreateCampaign() {
     });
   };
 
+  /**
+   * ставит значения в поле изменения оффера по стейту и ид оффера
+   * @param state {Redux.State} - состояния хранилища store
+   * @param offerId {number} - ид оффера
+   */
+  const setOfferValues = (state: any, offerId: number) => {
+    const { getOffersData } = state;
+    const { data }: any = getOffersData;
+    const { offers } = data.body;
+    let needOffer: any = {};
+    offers.map((item: Types.Offer) => {
+      if (offerId === item.id) {
+        needOffer = item;
+      }
+      return 0;
+    });
+    if (!update && offerId === -1) {
+      needOffer = {
+        title: '',
+        description: '',
+      };
+      _offerImage = {};
+      _offerIcon = {};
+    } else {
+      _offerImage.name = needOffer.image;
+      _offerIcon.name = needOffer.icon;
+      setOfferIcon(_offerIcon);
+      setOfferImage(_offerImage);
+    }
+    setOffer(-1);
+    setOfferTitle(needOffer.title);
+    setOfferDescription(needOffer.description);
+  };
+
   useEffect(() => {
+    // при каждам обновлении запрашивает список оффера пользователя, по событию ответа начинаются движения
     getOffers();
     _loadStoreSubs = loadStore.subscribe(() => {
       setLoad(loadStore.getState().value);
     });
-    // Обработчик запроса на сервер
+    // Обработчик запросов на сервер
     _storeSubs = store.subscribe(() => {
       const state: Types.Reducer = store.getState();
       const {
@@ -175,15 +522,96 @@ export default function CreateCampaign() {
         createOfferData,
         uploadOfferIconData,
         uploadOfferImageData,
+        getCampaignData,
+        updateOfferData,
+        updateCampaignData,
       } = state;
+      if (getCampaignData) {
+        // Когда идет изменение кампании
+        if (state.type === 'GET_CAMPAIGN_FAILED') {
+          const { message }: any = getCampaignData.data?.errorData;
+          enqueueSnackbar(`Get campaign: ${message}`);
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+        } else if (state.type === 'GET_CAMPAIGN_SUCCEEDED') {
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+          const { data }: any = getCampaignData;
+          if (data.result !== 'success') {
+            enqueueSnackbar(data.message);
+            return 1;
+          }
+          const { campaign } = data.body;
+          // Заполняем поля значениями
+          setTitle(campaign.title);
+          _campaign.title = campaign.title;
+          setLink(campaign.link);
+          _campaign.link = campaign.link;
+          _campaign.offer_id = campaign.offer_id;
+          setOfferValues(state, campaign.offer_id);
+          _oldCountries = JSON.parse(campaign.countries).map((item: any) => ({
+            name: item,
+            code: item,
+          }));
+          setCountryList(_oldCountries);
+          _campaign.countries = JSON.parse(campaign.countries);
+          const oldIpPattern = JSON.parse(campaign.ip_pattern);
+          setIps(oldIpPattern);
+          _campaign.ip_pattern = oldIpPattern;
+          setPrice(parseFloat(campaign.price));
+          _campaign.price = campaign.price;
+          setBudget(parseFloat(campaign.budget));
+          _campaign.budget = campaign.budget;
+          const oldWhiteList = JSON.parse(campaign.white_list);
+          setWhiteList(oldWhiteList);
+          _campaign.white_list = oldWhiteList;
+          const oldBlackList = JSON.parse(campaign.black_list);
+          setBlackList(oldBlackList);
+          _campaign.black_list = oldBlackList;
+          setOffer(campaign.offer_id);
+          _campaign.offer_id = campaign.offer_id;
+        }
+      }
+      if (updateCampaignData) {
+        if (state.type === 'UPDATE_CAMPAIGN_FAILED') {
+          const { message }: any = updateCampaignData.data?.errorData;
+          enqueueSnackbar(`Update campaign: ${message}`);
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+        } else if (state.type === 'UPDATE_CAMPAIGN_SUCCEEDED') {
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+          const { data }: any = updateCampaignData;
+          setAlert({
+            status: data.result,
+            message: data.message,
+            open: true,
+          });
+          getOffers();
+        }
+      }
+      if (updateOfferData) {
+        if (state.type === 'UPDATE_OFFER_FAILED') {
+          const { message }: any = updateOfferData.data?.errorData;
+          enqueueSnackbar(`Update offer: ${message}`);
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+        } else if (state.type === 'UPDATE_OFFER_SUCCEEDED') {
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
+          const { data }: any = updateOfferData;
+          if (data.result !== 'success') {
+            enqueueSnackbar(data.message);
+            return 1;
+          }
+          const offerId = data.body.id;
+          _campaign.offer_id = offerId;
+          updateOfferIcon(offerId);
+          updateOfferImage(offerId);
+          updateCampaign();
+        }
+      }
       if (createCampaignData) {
         if (state.type === 'CREATE_CAMPAIGN_FAILED') {
           const { message }: any = createCampaignData.data?.errorData;
-          enqueueSnackbar(`Registration: ${message}`);
+          enqueueSnackbar(`Create campaign: ${message}`);
           loadStore.dispatch({ type: 'SET_LOAD', value: false });
         } else if (state.type === 'CREATE_CAMPAIGN_SUCCEEDED') {
-          loadStore.dispatch({ type: 'SET_LOAD', value: false });
-          const { data } = createCampaignData;
+          const { data }: any = createCampaignData;
           const newAlert: any = {
             open: true,
             message: data?.message,
@@ -191,9 +619,11 @@ export default function CreateCampaign() {
           };
           setAlert(newAlert);
           if (data?.result === 'success') {
-            //
+            setTimeout(() => {
+              history.push(`/update-campaign/${data.body.campaign.id}`);
+            }, 1500);
           }
-          // TODO
+          loadStore.dispatch({ type: 'SET_LOAD', value: false });
         }
       }
       if (searchCountriesData) {
@@ -215,7 +645,7 @@ export default function CreateCampaign() {
                   const { target } = e;
                   const code = target.getAttribute('id');
                   const name = target.getAttribute('value');
-                  const newCl = Object.assign(countryList);
+                  const newCl = Object.assign(_oldCountries, countryList);
                   let checkContry = false;
                   newCl.map((item1: any) => {
                     if (code === item1.code) checkContry = true;
@@ -252,12 +682,40 @@ export default function CreateCampaign() {
           enqueueSnackbar(`Get offers: ${message}`);
           loadStore.dispatch({ type: 'SET_LOAD', value: false });
         } else if (state.type === 'GET_OFFERS_SUCCEEDED') {
+          // Если обновление то запрашивает кампанию
+          if (update) {
+            _cleared = false;
+            // eslint-disable-next-line prefer-destructuring
+            _id = history.location.pathname.match(/\d+$/)[0];
+            action({
+              type: 'GET_CAMPAIGN_REQUESTED',
+              args: {
+                id: _id,
+              },
+            });
+          } else if (!_cleared) {
+            _cleared = true;
+            // Чистим поля и задействованые глобальные переменные, если перешли с редактирования кампании
+            _oldCountries = [];
+            setCountries(<div />);
+            setTitle('');
+            setLink('http://');
+            setOfferValues(state, -1);
+            setCountryList([]);
+            setIps([]);
+            setPrice(0);
+            setBudget(0);
+            setWhiteList([]);
+            setBlackList([]);
+            setOffer(-1);
+          }
           loadStore.dispatch({ type: 'SET_LOAD', value: false });
           const { data }: any = getOffersData;
           if (data?.result !== 'success') {
             enqueueSnackbar(data?.message);
             return 1;
           }
+          // При любом контексте заполняет селектор выбора оффера
           let myOffers = data.body.offers;
           myOffers = myOffers.map((item: Types.Offer) => {
             return (
@@ -272,12 +730,9 @@ export default function CreateCampaign() {
             </MenuItem>
           );
           setOffersOptions(myOffers);
-          setOffer(offer);
-          setOfferTitle('');
-          setOfferDescription('');
-          setOfferIcon({});
-          setOfferImage({});
-          setAlignment('add');
+          // При любом контексте сначала переводит на выбор или изменение оффера
+          _alignment = 'add';
+          setAlignment(_alignment);
         }
       }
       if (createOfferData) {
@@ -299,31 +754,18 @@ export default function CreateCampaign() {
           }
           enqueueSnackbar(data.message);
           const offerId = data.body.offer.id;
+          // Шлет подряд на изменение картинок
+          updateOfferIcon(offerId);
+          updateOfferImage(offerId);
           setOffer(offerId);
-          if (offerIcon.name) {
-            const formIcon: any = document.getElementById('icon');
-            const formDataIcon = new FormData(formIcon);
-            action({
-              type: 'UPLOAD_OFFER_ICON_REQUESTED',
-              args: {
-                id: offerId,
-                body: formDataIcon,
-              },
-            });
+          // Когда обновление кампании при новом оффере
+          if (update) {
+            _campaign.offer_id = offerId;
+            updateCampaign();
+          } else {
+            getOffers();
+            createCampaign();
           }
-          if (offerImage.name) {
-            const formImage: any = document.getElementById('image');
-            const formDataImage = new FormData(formImage);
-            action({
-              type: 'UPLOAD_OFFER_IMAGE_REQUESTED',
-              args: {
-                id: offerId,
-                body: formDataImage,
-              },
-            });
-          }
-          getOffers();
-          createCampaign();
         }
       }
       if (uploadOfferIconData) {
@@ -334,8 +776,10 @@ export default function CreateCampaign() {
         } else if (state.type === 'UPLOAD_OFFER_ICON_SUCCEEDED') {
           loadStore.dispatch({ type: 'SET_LOAD', value: false });
           const { data }: any = uploadOfferIconData;
-          if (data.result !== 'success') {
+          // В случае ошибки выбрасывает снакбар с сообщением
+          if (data?.result !== 'success') {
             enqueueSnackbar(data?.message);
+            return 1;
           }
         }
       }
@@ -347,8 +791,9 @@ export default function CreateCampaign() {
         } else if (state.type === 'UPLOAD_OFFER_IMAGE_SUCCEEDED') {
           loadStore.dispatch({ type: 'SET_LOAD', value: false });
           const { data }: any = uploadOfferImageData;
-          if (data.result !== 'success') {
+          if (data?.result !== 'success') {
             enqueueSnackbar(data?.message);
+            return 1;
           }
         }
       }
@@ -358,25 +803,27 @@ export default function CreateCampaign() {
       _storeSubs();
       _loadStoreSubs();
     };
-  }, [offer]);
+  }, [history.location.pathname]);
 
   return (
     <Auth redirect={true} roles={['admin', 'user']}>
       <div className={clsx('login-wrapper', 'col-center')}>
         <div className="header">
-          <Typography variant="h4">Add new campaign</Typography>
+          <Typography variant="h4">{update ? 'Edit campaign' : 'Add new campaign'}</Typography>
         </div>
         <div className="form-item">
-          <Typography>Please fill in all fields</Typography>
+          <Typography>{update ? 'Change any fields' : 'Please fill in fields'}</Typography>
         </div>
         <FormGroup className={classes.root}>
           <FormLabel>Title</FormLabel>
           <div className={clsx('form-item', 'col-center')}>
             <TextField
               fullWidth
-              defaultValue={title}
+              value={title}
               onChange={(e: any) => {
-                setTitle(e.target.value);
+                const { value } = e.target;
+                setTitle(value);
+                _campaign.title = value;
               }}
               type="text"
               variant="outlined"
@@ -388,12 +835,13 @@ export default function CreateCampaign() {
             <TextField
               error={linkError}
               fullWidth
-              defaultValue={link}
+              value={link}
               onChange={(e: any) => {
                 const { value } = e.target;
                 if (!urlReg.test(value) && value !== '') {
                   setLinkError(true);
                 } else {
+                  _campaign.link = value;
                   setLink(value);
                   setLinkError(false);
                 }
@@ -413,11 +861,13 @@ export default function CreateCampaign() {
                       label={item.name}
                       id={item.code}
                       onDelete={(e) => {
+                        // Удаление чипа со страной из списка
                         let ele = e.target.parentElement;
                         ele = ele.getAttribute('role') === 'button' ? ele : ele.parentElement;
-                        const newC = countryList.filter((el) => {
+                        const newC: any = countryList.filter((el) => {
                           return el.code !== ele.getAttribute('id');
                         });
+                        _campaign.countries = newC.map((i: any) => i.code);
                         setCountryList(newC);
                       }}
                       color="secondary"
@@ -432,6 +882,7 @@ export default function CreateCampaign() {
               aria-describedby="transitions-popper"
               fullWidth
               onClick={(e: any) => {
+                // Запрос списка стран по значению поля, при клике
                 const { value } = e.target;
                 if (value !== '') {
                   changeCountries(e);
@@ -440,6 +891,7 @@ export default function CreateCampaign() {
                 }
               }}
               onChange={(e: any) => {
+                // При изменении
                 const { value } = e.target;
                 if (value !== '') {
                   changeCountries(e);
@@ -457,10 +909,12 @@ export default function CreateCampaign() {
           <div className={clsx('form-item', 'col-center')}>
             <TextField
               fullWidth
-              defaultValue={price}
+              value={price}
               onChange={(e: any) => {
                 const { value }: any = e.target;
-                setPrice(parseFloat(value));
+                const valueInt = parseFloat(value);
+                _campaign.price = valueInt;
+                setPrice(valueInt);
               }}
               type="number"
               variant="outlined"
@@ -471,10 +925,12 @@ export default function CreateCampaign() {
           <div className={clsx('form-item', 'col-center')}>
             <TextField
               fullWidth
-              defaultValue={budget}
+              value={budget}
               onChange={(e: any) => {
                 const { value }: any = e.target;
-                setBudget(parseFloat(value));
+                const valueInt = parseFloat(value);
+                _campaign.budget = valueInt;
+                setBudget(valueInt);
               }}
               type="number"
               variant="outlined"
@@ -485,6 +941,7 @@ export default function CreateCampaign() {
           <Paper>
             <div className="wrap-center">
               {ips.map((item: string) => {
+                // Вывод чипов с ИП паттерном
                 return (
                   <div key={item} className="margin-4">
                     <Chip
@@ -493,9 +950,10 @@ export default function CreateCampaign() {
                       onDelete={(e) => {
                         let ele = e.target.parentElement;
                         ele = ele.getAttribute('role') === 'button' ? ele : ele.parentElement;
-                        const newC1 = ips.filter((el) => {
+                        const newC1: any = ips.filter((el) => {
                           return el !== ele.getAttribute('id');
                         });
+                        _campaign.ip_pattern = newC1;
                         setIps(newC1);
                       }}
                       color="secondary"
@@ -511,6 +969,7 @@ export default function CreateCampaign() {
               fullWidth
               value={ip}
               onChange={(e: any) => {
+                // Проверка введенных ИП
                 const { value } = e.target;
                 setIp(value);
                 if (value === '') {
@@ -531,11 +990,13 @@ export default function CreateCampaign() {
                   <InputAdornment position="end">
                     <IconButton
                       onClick={() => {
+                        // клик по добавлению напечатанного ИП
                         const ipsCopy = Object.assign(ips);
                         if (ip === '') {
                           enqueueSnackbar('Empty IP not added!');
                         } else if (ipsCopy.indexOf(ip) === -1) {
                           ipsCopy.push(ip);
+                          _campaign.ip_pattern = ipsCopy;
                           setIps(ipsCopy);
                           setIp('');
                         } else {
@@ -561,11 +1022,13 @@ export default function CreateCampaign() {
                       label={item}
                       id={item}
                       onDelete={(e) => {
+                        // Удаление при клике по крестику чипа с белыми ИП
                         let ele = e.target.parentElement;
                         ele = ele.getAttribute('role') === 'button' ? ele : ele.parentElement;
-                        const newC1 = whiteList.filter((el) => {
+                        const newC1: any = whiteList.filter((el) => {
                           return el !== ele.getAttribute('id');
                         });
+                        _campaign.white_list = newC1;
                         setWhiteList(newC1);
                       }}
                       color="secondary"
@@ -581,6 +1044,7 @@ export default function CreateCampaign() {
               fullWidth
               value={whiteIp}
               onChange={(e: any) => {
+                // Проверка введенных белых ИП
                 const { value } = e.target;
                 setWhiteIp(value);
                 if (value === '') {
@@ -601,11 +1065,13 @@ export default function CreateCampaign() {
                   <InputAdornment position="end">
                     <IconButton
                       onClick={() => {
+                        // Удаление белого ИП из чипов
                         const ipsCopy = Object.assign(whiteList);
                         if (whiteIp === '') {
                           enqueueSnackbar('Empty IP not added!');
                         } else if (ipsCopy.indexOf(whiteIp) === -1) {
                           ipsCopy.push(whiteIp);
+                          _campaign.white_list = ipsCopy;
                           setWhiteList(ipsCopy);
                           setWhiteIp('');
                         } else {
@@ -631,11 +1097,13 @@ export default function CreateCampaign() {
                       label={item}
                       id={item}
                       onDelete={(e) => {
+                        // Событие при клике крестика по чипу черных ИП
                         let ele = e.target.parentElement;
                         ele = ele.getAttribute('role') === 'button' ? ele : ele.parentElement;
-                        const newC1 = blackList.filter((el) => {
+                        const newC1: any = blackList.filter((el) => {
                           return el !== ele.getAttribute('id');
                         });
+                        _campaign.black_list = newC1;
                         setBlackList(newC1);
                       }}
                       color="secondary"
@@ -651,6 +1119,7 @@ export default function CreateCampaign() {
               fullWidth
               value={blackIp}
               onChange={(e: any) => {
+                // Проверка введенных черных ИП
                 const { value } = e.target;
                 setBlackIp(value);
                 if (value === '') {
@@ -671,12 +1140,14 @@ export default function CreateCampaign() {
                   <InputAdornment position="end">
                     <IconButton
                       onClick={() => {
+                        // Добавление черного ип при клике на плюсик
                         const ipsCopy = Object.assign(blackList);
                         if (blackIp === '') {
                           enqueueSnackbar('Empty IP not added!');
                         } else if (ipsCopy.indexOf(blackIp) === -1) {
                           ipsCopy.push(blackIp);
                           setBlackList(ipsCopy);
+                          _campaign.black_list = ipsCopy;
                           setBlackIp('');
                         } else {
                           enqueueSnackbar(`${blackIp} will added earlier!`);
@@ -709,150 +1180,66 @@ export default function CreateCampaign() {
             </div>
           </div>
           <div className="form-item">
-            {alignment === 'add' ? (
+            {/** В зависимости от выбранного типа оффера вставляет селектор с формой или форму */}
+            {_alignment === 'add' ? (
               <div className="col-center">
                 <FormLabel>Select offer</FormLabel>
-                <div className="form-item">
+                <div className={clsx('form-item', 'col-center')}>
                   <BlockSelect
                     value={offer}
                     name="Offer"
                     handleChange={(e) => {
                       const { value } = e.target;
-                      setOffer(value);
+                      const _offerId = parseInt(value, 10);
+                      const state = store.getState();
+                      setOfferValues(state, _offerId);
+                      setTimeout(() => {
+                        setOffer(_offerId);
+                      }, 0);
                     }}>
                     {offersOptions}
                   </BlockSelect>
+                  <br />
+                  {/** Вставляет компонент обновления оффера или скелетон */}
+                  {offer !== -1 ? (
+                    <OfferUpdate
+                      offerIcon={offerIcon}
+                      offerImage={offerImage}
+                      setOfferIcon={setOfferIcon}
+                      setOfferImage={setOfferImage}
+                      offerId={offer}
+                      offerDescription={offerDescription}
+                      setOfferDescription={setOfferDescription}
+                      offerTitle={offerTitle}
+                      setOfferTitle={setOfferTitle}
+                      classes={classes}
+                    />
+                  ) : (
+                    <div className="col-center">
+                      <Skeleton variant="rect" width={minWidth} height={40} />
+                      <br />
+                      <Skeleton variant="rect" width={minWidth} height={80} />
+                      <br />
+                      <div className="row-center">
+                        <Skeleton variant="rect" width={minWidth / 2} height={300} />
+                        <Skeleton variant="rect" width={minWidth / 2} height={300} />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
-              <div>
-                <div className={clsx('col-center')}>
-                  <Typography variant="h6">Create new offer</Typography>
-                </div>
-                <br />
-                <div className="col-center">
-                  <FormLabel>Title</FormLabel>
-                </div>
-                <div className={clsx('form-item')}>
-                  <TextField
-                    fullWidth
-                    defaultValue={offerTitle}
-                    onChange={(e: any) => {
-                      const { value }: any = e.target;
-                      setOfferTitle(value);
-                    }}
-                    type="text"
-                    variant="outlined"
-                    placeholder="offer title"
-                  />
-                </div>
-                <div className="col-center">
-                  <FormLabel>Description</FormLabel>
-                </div>
-                <div className={clsx('form-item', 'col-center')}>
-                  <TextareaAutosize
-                    value={offerDescription}
-                    onChange={(e: any) => {
-                      const { value } = e.target;
-                      setOfferDescription(value);
-                    }}
-                    aria-label="minimum height"
-                    rowsMin={3}
-                    cols={minWidth / 10}
-                    placeholder="Offer description"
-                  />
-                </div>
-                <div className={clsx('form-input', 'row')}>
-                  <Card className={classes.card} variant="outlined">
-                    <CardContent>
-                      <Typography variant="h6">Insert icon</Typography>
-                      <Typography variant="body1">Accepted all image types</Typography>
-                      <div className="row-center">
-                        <FormLabel>Upload:</FormLabel>
-                        <IconButton
-                          onClick={() => {
-                            if (iconRef !== null) {
-                              iconRef.current?.click();
-                            }
-                          }}>
-                          <UploadIcon color="secondary" />
-                        </IconButton>
-                      </div>
-                      {offerIcon.name ? (
-                        <Paper className={classes.padding}>
-                          {offerIcon.name}
-                          <IconButton
-                            onClick={() => {
-                              setOfferIcon({});
-                            }}>
-                            <DeleteIcon color="error" />
-                          </IconButton>
-                        </Paper>
-                      ) : (
-                        ''
-                      )}
-                    </CardContent>
-                  </Card>
-                  <Card className={classes.card} variant="outlined">
-                    <CardContent>
-                      <Typography variant="h6">Insert image</Typography>
-                      <Typography variant="body1">Accepted all image types</Typography>
-                      <div className="row-center">
-                        <FormLabel>Upload:</FormLabel>
-                        <IconButton
-                          onClick={() => {
-                            if (imageRef !== null) {
-                              imageRef.current?.click();
-                            }
-                          }}>
-                          <UploadIcon color="secondary" />
-                        </IconButton>
-                      </div>
-                      {offerImage.name ? (
-                        <Paper className={classes.padding}>
-                          {offerImage.name}
-                          <IconButton
-                            onClick={() => {
-                              setOfferImage({});
-                            }}>
-                            <DeleteIcon color="error" />
-                          </IconButton>
-                        </Paper>
-                      ) : (
-                        ''
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-                <div className="form-input">
-                  <form id="icon">
-                    <input
-                      name="icon"
-                      onChange={(e: any) => {
-                        const { files } = e.target;
-                        if (files) setOfferIcon(files[0]);
-                      }}
-                      accept="image/*"
-                      hidden
-                      type="file"
-                      ref={iconRef}
-                    />
-                  </form>
-                  <form id="image">
-                    <input
-                      name="image"
-                      onChange={(e: any) => {
-                        const { files } = e.target;
-                        if (files) setOfferImage(files[0]);
-                      }}
-                      accept="image/*"
-                      hidden
-                      type="file"
-                      ref={imageRef}
-                    />
-                  </form>
-                </div>
-              </div>
+              <OfferUpdate
+                offerIcon={offerIcon}
+                offerImage={offerImage}
+                setOfferIcon={setOfferIcon}
+                setOfferImage={setOfferImage}
+                offerDescription={offerDescription}
+                setOfferDescription={setOfferDescription}
+                offerTitle={offerTitle}
+                setOfferTitle={setOfferTitle}
+                classes={classes}
+              />
             )}
           </div>
         </FormGroup>
@@ -869,15 +1256,22 @@ export default function CreateCampaign() {
               type="submit"
               // eslint-disable-next-line no-unused-vars
               onClick={(e: any) => {
+                // Порядок действий при нажатии кнопки, в зависимости от контекста и типа оффера
                 setAlert(_alert);
                 loadStore.dispatch({ type: 'SET_LOAD', value: true });
-                if (alignment === 'new') {
+                if (update) {
+                  if (_alignment === 'new') {
+                    createOffer();
+                  } else {
+                    updateOffer();
+                  }
+                } else if (_alignment === 'new') {
                   createOffer();
                 } else {
                   createCampaign();
                 }
               }}>
-              Save
+              {update ? 'Update' : 'Create'}
             </Button>
           )}
         </div>
