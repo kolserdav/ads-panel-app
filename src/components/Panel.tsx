@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -22,14 +22,14 @@ import LoginIcon from '@material-ui/icons/Input';
 import RegistrationIcon from '@material-ui/icons/PersonAdd';
 import HomeIcon from '@material-ui/icons/Home';
 import CampaignsIcon from '@material-ui/icons/LineStyle';
-import StatusesIcon from '@material-ui/icons/VerifiedUser';
+import ProfileIcon from '@material-ui/icons/AccountBox';
 import LogoutIcon from '@material-ui/icons/ExitToApp';
 import CreateIcon from '@material-ui/icons/Queue';
 import { Link, useHistory } from 'react-router-dom';
 import { LinearProgress } from '@material-ui/core';
 import { Cookies } from 'react-cookie';
 import AlertDialog from './Dialog';
-import { loadStore } from '../store';
+import { loadStore, store } from '../store';
 import Auth from './Auth';
 import * as Types from '../react-app-env';
 
@@ -120,6 +120,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 let _load = true;
+let _storeSubs: any = () => {};
 
 export default function Panel(props: Types.PanelProps) {
   const history = useHistory();
@@ -130,6 +131,7 @@ export default function Panel(props: Types.PanelProps) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [load, setLoad] = React.useState(true);
+  const [id, setId] = useState<number>(-1);
   const dialog: Types.DialogProps = {
     open: false,
     title: 'Closed...',
@@ -147,6 +149,14 @@ export default function Panel(props: Types.PanelProps) {
   };
 
   useEffect(() => {
+    _storeSubs = store.subscribe(() => {
+      const state: any = store.getState().userData;
+      if (state) {
+        if (state.type === 'USER_FETCH_SUCCEEDED') {
+          setId(state.data?.body.user.id);
+        }
+      }
+    });
     loadStore.subscribe(() => {
       const { value }: any = loadStore.getState();
       if (value !== _load) {
@@ -154,7 +164,10 @@ export default function Panel(props: Types.PanelProps) {
         _load = value;
       }
     });
-  }, [load]);
+    return () => {
+      _storeSubs();
+    };
+  }, [load, id]);
 
   return (
     <div className={classes.root}>
@@ -259,6 +272,16 @@ export default function Panel(props: Types.PanelProps) {
                   <RegistrationIcon />
                 </ListItemIcon>
                 <ListItemText primary="Registration" />
+              </ListItem>
+            </Link>
+          </Auth>
+          <Auth redirect={false} roles={['admin', 'user']}>
+            <Link className="menu-link" to={`/profile/${id}`}>
+              <ListItem button selected={pathname.match(/^\/profile\/\d+$/) !== null}>
+                <ListItemIcon>
+                  <ProfileIcon />
+                </ListItemIcon>
+                <ListItemText primary="Profile" />
               </ListItem>
             </Link>
           </Auth>

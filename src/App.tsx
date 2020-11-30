@@ -13,7 +13,7 @@ import Confirm from './views/Confirm';
 import Forgot from './views/Forgot';
 import Campaigns from './views/Campaigns';
 import ChangePassword from './views/ChangePassword';
-import CreateCampaign from './views/CreateCampaign';
+import CreateUpdateCampaign from './views/CreateUpdateCampaign';
 import { action } from './store';
 
 const theme = createMuiTheme({
@@ -74,6 +74,8 @@ function App(props: any) {
       default:
         break;
     }
+    if (pathname.match(/^\/update-campaign\/\d+$/)) header = 'Update campaign';
+    if (pathname.match(/^\/profile\/\d+$/)) header = 'My profile';
     if (mounted) setTitle(header);
     const token = cookies.get('_qt');
     // Если токен не поменялся значит сессия та же и при переходах не запрашивает аутентификацию
@@ -98,7 +100,7 @@ function App(props: any) {
             <Dashboard />
           </Route>
           <Route path="/registration">
-            <Registration />
+            <Registration update={false} />
           </Route>
           <Route path="/confirm">
             <Confirm />
@@ -113,10 +115,13 @@ function App(props: any) {
             <Campaigns />
           </Route>
           <Route path="/new-campaign">
-            <CreateCampaign />
+            <CreateUpdateCampaign />
           </Route>
           <Route path="/update-campaign/:id">
-            <CreateCampaign update={true} />
+            <CreateUpdateCampaign update={true} />
+          </Route>
+          <Route path="/profile/:id">
+            <Registration update={true} />
           </Route>
           <Route path="/">{pathname === '/' ? <Home /> : <Page404 />}</Route>
         </Switch>

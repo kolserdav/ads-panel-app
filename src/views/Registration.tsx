@@ -21,7 +21,22 @@ import Auth from '../components/Auth';
 let _storeSubs: any = () => {};
 let _loadStoreSubs: any = () => {};
 
-export default function Registration() {
+let userId = -1;
+
+interface RegistrationInterface {
+  update: boolean;
+}
+
+export default function Registration(props: RegistrationInterface) {
+  const { update } = props;
+  const history = useHistory();
+  if (update) {
+    const { pathname } = history.location;
+    const newUserId = pathname.match(/\d+$/);
+    if (newUserId) {
+      userId = parseInt(newUserId[0], 10);
+    }
+  }
   const { enqueueSnackbar } = useSnackbar();
   // eslint-disable-next-line no-unused-vars
   const [cookies, setCookie] = useCookies([]);
@@ -34,7 +49,7 @@ export default function Registration() {
   const [skype, setSkype] = useState('');
   const [passwordRepeat, setPasswordRepeat] = useState('');
   const [load, setLoad] = useState(false);
-  const history = useHistory();
+  const [user, setUser] = useState<Types.User>();
   const _alert: Types.AlertProps = {
     message: 'Alert closed',
     status: 'info',
@@ -49,7 +64,23 @@ export default function Registration() {
     // Обработчик запроса на сервер
     _storeSubs = store.subscribe(() => {
       const state: Types.Reducer = store.getState();
+      if (update) {
+        const { userData } = state;
+        if (userData) {
+          // Когда нужно последнее событи конкретного объекта хранилища
+          if (userData.type === 'USER_FETCH_SUCCEEDED') {
+            const { data }: any = userData;
+            const { body } = data;
+            if (userId !== body.user.id && body.user.admin !== 1) {
+              history.push('/');
+            } else {
+              setUser(body.user);
+            }
+          }
+        }
+      }
       if (state.registerData) {
+        // Когда нужно самое последнее событие хранилища
         if (state.type === 'REGISTRATION_FAILED') {
           const { message }: any = state.registerData.data?.errorData;
           enqueueSnackbar(`Registration: ${message}`);
