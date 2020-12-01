@@ -331,11 +331,10 @@ export default function Registration(props: RegistrationInterface) {
               placeholder="email"
             />
           </div>
-          <div className="col-center">
-            <Forgot userEmail={email} showAsAdmin={showAsAdmin} />
-          </div>
           {update ? (
-            ''
+            <div className="col-center">
+              <Forgot userEmail={email} showAsAdmin={showAsAdmin} />
+            </div>
           ) : (
             <div>
               <FormLabel>Password</FormLabel>
