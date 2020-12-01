@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import StatusIcon from '@material-ui/icons/VerifiedUser';
@@ -85,7 +85,9 @@ export default function TableCampaigns(props: Types.TableCampaignsProps) {
                 <TableCell component="th" scope="row">
                   {row.id}
                 </TableCell>
-                <TableCell align="right">{row.title}</TableCell>
+                <TableCell align="right">
+                  <Link to={`/campaign/${row.id}`}>{row.title}</Link>
+                </TableCell>
                 <TableCell align="right"> {row.status}</TableCell>
                 <TableCell align="right">{row.owner}</TableCell>
                 <TableCell align="right">{row.price}</TableCell>
@@ -110,7 +112,9 @@ export default function TableCampaigns(props: Types.TableCampaignsProps) {
                     {userId === row.userId ? (
                       <IconButton
                         title="Edit campaign"
-                        onClick={() => { history.push(`/update-campaign/${row.id}`) }}>
+                        onClick={() => {
+                          history.push(`/campaign/${row.id}`);
+                        }}>
                         <EditIcon color="secondary" />
                       </IconButton>
                     ) : (

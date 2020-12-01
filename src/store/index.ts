@@ -12,6 +12,9 @@ import Types from '../react-app-env';
 import appReducer from './reducers';
 import {
   userSaga,
+  userUpdateSaga,
+  getUserForAdminSaga,
+  getUsersForAdminSaga,
   loginSaga,
   registerSaga,
   confirmSaga,
@@ -37,6 +40,9 @@ const sagaMiddleware = createSagaMiddleware();
 const store = createStore(appReducer, applyMiddleware(sagaMiddleware));
 // Навешивает посредников
 sagaMiddleware.run(userSaga);
+sagaMiddleware.run(userUpdateSaga);
+sagaMiddleware.run(getUserForAdminSaga);
+sagaMiddleware.run(getUsersForAdminSaga);
 sagaMiddleware.run(loginSaga);
 sagaMiddleware.run(registerSaga);
 sagaMiddleware.run(confirmSaga);

@@ -76,6 +76,7 @@ let _offerImage: Types.OfferImage = {};
 // Блок обновления и создания оффера
 const OfferUpdate = (props: Types.OfferUpdateProps) => {
   const {
+    disabled,
     offerTitle,
     setOfferTitle,
     offerDescription,
@@ -106,6 +107,7 @@ const OfferUpdate = (props: Types.OfferUpdateProps) => {
       </div>
       <div className={clsx('form-item')}>
         <TextField
+          disabled={disabled}
           fullWidth
           defaultValue={offerTitle}
           onChange={(e: any) => {
@@ -122,6 +124,7 @@ const OfferUpdate = (props: Types.OfferUpdateProps) => {
       </div>
       <div className={clsx('form-item', 'col-center')}>
         <TextareaAutosize
+          disabled={disabled}
           value={offerDescription}
           onChange={(e: any) => {
             const { value } = e.target;
@@ -144,6 +147,7 @@ const OfferUpdate = (props: Types.OfferUpdateProps) => {
             <div className="row-center">
               <FormLabel>Upload:</FormLabel>
               <IconButton
+                disabled={disabled}
                 onClick={() => {
                   const d: any = document.getElementById(`icon-${_alignment}`);
                   d.firstChild.click();
@@ -157,6 +161,7 @@ const OfferUpdate = (props: Types.OfferUpdateProps) => {
                   <Paper className={classes.padding}>
                     {offerIcon.name}
                     <IconButton
+                      disabled={disabled}
                       onClick={() => {
                         _offerIcon = {};
                         setOfferIcon(_offerIcon);
@@ -175,6 +180,7 @@ const OfferUpdate = (props: Types.OfferUpdateProps) => {
                       }`}
                     />
                     <IconButton
+                      disabled={disabled}
                       onClick={() => {
                         _offerIcon = {};
                         setOfferIcon(_offerIcon);
@@ -196,6 +202,7 @@ const OfferUpdate = (props: Types.OfferUpdateProps) => {
             <div className="row-center">
               <FormLabel>Upload:</FormLabel>
               <IconButton
+                disabled={disabled}
                 onClick={() => {
                   const d: any = document.getElementById(`image-${_alignment}`);
                   d.firstChild.click();
@@ -209,6 +216,7 @@ const OfferUpdate = (props: Types.OfferUpdateProps) => {
                   <Paper className={classes.padding}>
                     {offerImage.name}
                     <IconButton
+                      disabled={disabled}
                       onClick={() => {
                         _offerImage = {};
                         setOfferImage(_offerImage);
@@ -227,6 +235,7 @@ const OfferUpdate = (props: Types.OfferUpdateProps) => {
                       }`}
                     />
                     <IconButton
+                      disabled={disabled}
                       onClick={() => {
                         _offerImage = {};
                         setOfferImage(_offerImage);
@@ -335,6 +344,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
   const [whiteIp, setWhiteIp] = useState<string>('');
   const [blackIp, setBlackIp] = useState<string>('');
   const [alignment, setAlignment] = React.useState('add');
+  const [showAsAdmin, setShowAsAdmin] = useState<boolean>(false);
   const _alert: Types.AlertProps = {
     message: 'Alert closed',
     status: 'info',
@@ -466,7 +476,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
       type: 'GET_OFFERS_REQUESTED',
       args: {
         body: {
-          self: 1,
+          self: 1, // TODO когда смотрит админ ему возвращает своих офферов
         },
       },
     });
@@ -525,7 +535,8 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
         getCampaignData,
         updateOfferData,
         updateCampaignData,
-      } = state;
+        userData,
+      }: any = state;
       if (getCampaignData) {
         // Когда идет изменение кампании
         if (state.type === 'GET_CAMPAIGN_FAILED') {
@@ -568,6 +579,11 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
           _campaign.black_list = oldBlackList;
           setOffer(campaign.offer_id);
           _campaign.offer_id = campaign.offer_id;
+          const { user }: any = userData?.data.body;
+          // Когда чужую кампанию смотрит админ
+          if (user.id !== campaign.user_id) {
+            setShowAsAdmin(true);
+          }
         }
       }
       if (updateCampaignData) {
@@ -818,6 +834,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
           <FormLabel>Title</FormLabel>
           <div className={clsx('form-item', 'col-center')}>
             <TextField
+              disabled={showAsAdmin}
               fullWidth
               value={title}
               onChange={(e: any) => {
@@ -833,6 +850,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
           <FormLabel>Link</FormLabel>
           <div className={clsx('form-item', 'col-center')}>
             <TextField
+              disabled={showAsAdmin}
               error={linkError}
               fullWidth
               value={link}
@@ -858,6 +876,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                 return (
                   <div key={item.code} className="margin-4">
                     <Chip
+                      disabled={showAsAdmin}
                       label={item.name}
                       id={item.code}
                       onDelete={(e) => {
@@ -879,6 +898,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
           </Paper>
           <div className={clsx('form-item', 'col-center')}>
             <TextField
+              disabled={showAsAdmin}
               aria-describedby="transitions-popper"
               fullWidth
               onClick={(e: any) => {
@@ -908,6 +928,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
           <FormLabel>Price</FormLabel>
           <div className={clsx('form-item', 'col-center')}>
             <TextField
+              disabled={showAsAdmin}
               fullWidth
               value={price}
               onChange={(e: any) => {
@@ -924,6 +945,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
           <FormLabel>Day budget</FormLabel>
           <div className={clsx('form-item', 'col-center')}>
             <TextField
+              disabled={showAsAdmin}
               fullWidth
               value={budget}
               onChange={(e: any) => {
@@ -945,6 +967,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                 return (
                   <div key={item} className="margin-4">
                     <Chip
+                      disabled={showAsAdmin}
                       label={item}
                       id={item}
                       onDelete={(e) => {
@@ -965,6 +988,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
           </Paper>
           <div className={clsx('form-item', 'col-center')}>
             <OutlinedInput
+              disabled={showAsAdmin}
               error={ipError}
               fullWidth
               value={ip}
@@ -989,6 +1013,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                 !ipError ? (
                   <InputAdornment position="end">
                     <IconButton
+                      disabled={showAsAdmin}
                       onClick={() => {
                         // клик по добавлению напечатанного ИП
                         const ipsCopy = Object.assign(ips);
@@ -1019,6 +1044,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                 return (
                   <div key={item} className="margin-4">
                     <Chip
+                      disabled={showAsAdmin}
                       label={item}
                       id={item}
                       onDelete={(e) => {
@@ -1040,6 +1066,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
           </Paper>
           <div className={clsx('form-item', 'col-center')}>
             <OutlinedInput
+              disabled={showAsAdmin}
               error={whiteIpError}
               fullWidth
               value={whiteIp}
@@ -1064,8 +1091,9 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                 !whiteIpError ? (
                   <InputAdornment position="end">
                     <IconButton
+                      disabled={showAsAdmin}
                       onClick={() => {
-                        // Удаление белого ИП из чипов
+                        // Добавление белого ИП в чипы
                         const ipsCopy = Object.assign(whiteList);
                         if (whiteIp === '') {
                           enqueueSnackbar('Empty IP not added!');
@@ -1094,6 +1122,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                 return (
                   <div key={item} className="margin-4">
                     <Chip
+                      disabled={showAsAdmin}
                       label={item}
                       id={item}
                       onDelete={(e) => {
@@ -1115,6 +1144,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
           </Paper>
           <div className={clsx('form-item', 'col-center')}>
             <OutlinedInput
+              disabled={showAsAdmin}
               error={blackIpError}
               fullWidth
               value={blackIp}
@@ -1139,6 +1169,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                 !blackIpError ? (
                   <InputAdornment position="end">
                     <IconButton
+                      disabled={showAsAdmin}
                       onClick={() => {
                         // Добавление черного ип при клике на плюсик
                         const ipsCopy = Object.assign(blackList);
@@ -1170,10 +1201,10 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                 exclusive
                 onChange={handleAlignment}
                 aria-label="text alignment">
-                <ToggleButton value="add" aria-label="left aligned">
+                <ToggleButton disabled={showAsAdmin} value="add" aria-label="left aligned">
                   Add existing <AddIcon color="secondary" />
                 </ToggleButton>
-                <ToggleButton value="new" aria-label="centered">
+                <ToggleButton disabled={showAsAdmin} value="new" aria-label="centered">
                   Create new <CreateIcon color="secondary" />
                 </ToggleButton>
               </ToggleButtonGroup>
@@ -1186,6 +1217,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                 <FormLabel>Select offer</FormLabel>
                 <div className={clsx('form-item', 'col-center')}>
                   <BlockSelect
+                    disabled={showAsAdmin}
                     value={offer}
                     name="Offer"
                     handleChange={(e) => {
@@ -1203,6 +1235,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                   {/** Вставляет компонент обновления оффера или скелетон */}
                   {offer !== -1 ? (
                     <OfferUpdate
+                      disabled={showAsAdmin}
                       offerIcon={offerIcon}
                       offerImage={offerImage}
                       setOfferIcon={setOfferIcon}
@@ -1230,6 +1263,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
               </div>
             ) : (
               <OfferUpdate
+                disabled={showAsAdmin}
                 offerIcon={offerIcon}
                 offerImage={offerImage}
                 setOfferIcon={setOfferIcon}
@@ -1250,6 +1284,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
             <CircularProgress />
           ) : (
             <Button
+              disabled={showAsAdmin}
               className={classes.root}
               variant="contained"
               color="secondary"

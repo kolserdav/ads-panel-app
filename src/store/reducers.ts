@@ -64,6 +64,105 @@ export default function appReducer(state = initialState, action: Types.Action): 
         },
       });
     /**
+     * Изменение данных пользователя
+     */
+    case 'USER_UPDATE_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        userUpdateData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'USER_UPDATE_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        userUpdateData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'USER_UPDATE_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        userUpdateData: {
+          type: action.type,
+          data: action,
+        },
+      });
+    /**
+     * Получение админом данных пользователя
+     */
+    case 'USER_FETCH_ADMIN_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        userFetchAdminData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'USER_FETCH_ADMIN_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        userFetchAdminData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'USER_FETCH_ADMIN_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        userFetchAdminData: {
+          type: action.type,
+          data: action,
+        },
+      });
+    /**
+     * Получение админом данных пользователей
+     */
+    case 'USERS_FETCH_ADMIN_REQUESTED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        usersFetchAdminData: {
+          type: action.type,
+          data: initialData,
+        },
+      });
+    case 'USERS_FETCH_ADMIN_SUCCEEDED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action.data;
+      return Object.assign(copyState, {
+        usersFetchAdminData: {
+          type: action.type,
+          data: action.data,
+        },
+      });
+    case 'USERS_FETCH_ADMIN_FAILED':
+      copyState = Object.assign(copyState, state);
+      copyState.type = action.type;
+      copyState.data = action;
+      return Object.assign(copyState, {
+        usersFetchAdminData: {
+          type: action.type,
+          data: action,
+        },
+      });
+    /**
      * Вход пользователя
      */
     case 'LOGIN_REQUESTED':

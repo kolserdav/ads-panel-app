@@ -26,8 +26,9 @@ export type DialogState = {
 }
 
 export type AlertProps = {
+  action?: any
   status: 'error' | 'success' | 'warning' | 'info'
-  message: string
+  message: string | React.JSXElementConstructor
   open?: boolean
 }
 
@@ -42,16 +43,21 @@ export type AuthProps = {
 export type User = {
   id: number
   admin: 1 | 0
-  confirmm: 1 | 0
+  confirm: 1 | 0
   first_name: string
   last_name: string
   email: string
   company: string
   skype: string
   balance: number | null
+  created: Date | string
+  updated: Date | string
 }
 
 export type ActionTypesUser = 'USER_FETCH_REQUESTED' | 'USER_FETCH_SUCCEEDED' | 'USER_FETCH_FAILED';
+export type ActionTypesUserForAdmin = 'USER_FETCH_ADMIN_REQUESTED' | 'USER_FETCH_ADMIN_SUCCEEDED' | 'USER_FETCH_ADMIN_FAILED';
+export type ActionTypesUsersForAdmin = 'USERS_FETCH_ADMIN_REQUESTED' | 'USERS_FETCH_ADMIN_SUCCEEDED' | 'USERS_FETCH_ADMIN_FAILED';
+export type ActionTypesUserUpdate = 'USER_UPDATE_REQUESTED' | 'USER_UPDATE_SUCCEEDED' | 'USER_UPDATE_FAILED';
 export type ActionTypesLogin = 'LOGIN_REQUESTED' | 'LOGIN_SUCCEEDED' | 'LOGIN_FAILED';
 export type ActionTypesRegistration = 'REGISTRATION_REQUESTED' | 'REGISTRATION_SUCCEEDED' | 'REGISTRATION_FAILED';
 export type ActionTypesConfirm = 'CONFIRM_REQUESTED' | 'CONFIRM_SUCCEEDED' | 'CONFIRM_FAILED';
@@ -72,13 +78,13 @@ export type ActionTypesGetCampaign = 'GET_CAMPAIGN_REQUESTED' | 'GET_CAMPAIGN_SU
 export type ActionTypesUpdateOffer = 'UPDATE_OFFER_REQUESTED' | 'UPDATE_OFFER_SUCCEEDED' | 'UPDATE_OFFER_FAILED';
 export type ActionTypesUpdateCampaign = 'UPDATE_CAMPAIGN_REQUESTED' | 'UPDATE_CAMPAIGN_SUCCEEDED' | 'UPDATE_CAMPAIGN_FAILED';
 
-export type ActionTypes = 'INITIAL_TYPE' | ActionTypesUser | ActionTypesLogin |
+export type ActionTypes = 'INITIAL_TYPE' | ActionTypesUser | ActionTypesLogin | ActionTypesUserUpdate |
  ActionTypesRegistration | ActionTypesConfirm | ActionTypesEmail | ActionTypesChangePass | 
  ActionTypesGraph | ActionTypesTable | ActionTypesCampaignsGet | ActionTypesChangeCampaignStatus | 
  ActionTypesCreateCampaign | ActionTypesSearchCounrties | ActionTypesGetOffers |
  ActionTypesCreateOffer | ActionTypesUploadOfferIcon | ActionTypesUploadOfferImage | 
  ActionTypesDeleteCampaign | ActionTypesGetCampaign | ActionTypesUpdateOffer | 
- ActionTypesUpdateCampaign;
+ ActionTypesUpdateCampaign | ActionTypesUserForAdmin | ActionTypesUsersForAdmin;
 
  export type Action = {
   type: ActionTypes
@@ -97,6 +103,9 @@ export type Reducer = {
   data?: Action 
   initialData?: action
   userData?: Action
+  userFetchAdminData?: Action
+  usersFetchAdminData?: Action
+  userUpdateData?: Action
   loginData?: Action
   registerData?: Action
   confirmData?: Action
@@ -116,6 +125,10 @@ export type Reducer = {
   getCampaignData?: Action
   updateOfferData?: Action
   updateCampaignData?: Action
+}
+
+export type TableUsersProps = {
+  rows: User[]
 }
 
 export type TableStatistic = {
@@ -169,12 +182,26 @@ export type Transaction = {
   comment: string
 };
 
-export type User = {
+export type UserFromServer = {
   id?: number
   confirm?: 0 | 1
   admin?: 0 | 1
   first_name: string
   last_name: string
+  email: string
+  password: string
+  company: string
+  skype: string
+  created?: Date
+  updated: Date
+};
+
+export type User = {
+  id?: number
+  confirm?: 0 | 1
+  admin?: 0 | 1
+  firstName: string
+  lastName: string
   email: string
   password: string
   company: string
@@ -193,6 +220,9 @@ export type ServerResponse = {
   result: 'error' | 'warning' | 'success' | 'wait'
   message: string
   body: {
+    sendConfirm?: 1 | 0
+    count?: number
+    users?: UserFromServer[]
     table?: TableStatistic[]
     graph?: TableStatistic[]
     require?: any
@@ -226,6 +256,7 @@ export type RequestMethods = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export type TimeValues = 'today' | 'yesterday' | 'last-3-days' | 'last-7-days' | 'this-month' | 'last-30-days' | 'last-month' | 'this-quarter' | 'this-year' | 'last-year' | 'custom';
 
 export type SelectProps = {
+  disabled?: boolean
   children: React.ReactElement[]
   handleChange: (event: React.ChangeEvent<{ value: any }>) => void
   value: any
@@ -251,6 +282,8 @@ export type DatePicker = {
 }
 
 export type TableStatisticRow = {
+  id: number
+  userId: number
   first: string
   value: any
   second: string
@@ -349,6 +382,7 @@ export type OfferIcon = any
 export type OfferImage = any
 
 export type OfferUpdateProps = {
+  disabled?: boolean
   offerId?: number
   offerTitle: string
   setOfferTitle: React.Dispatch<string>

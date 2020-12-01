@@ -55,7 +55,7 @@ export default function Auth(props: Types.AuthProps) {
   const checkRoles = () => {
     // TODO delete exployt
     const { REACT_APP_DATE_NOW }: any = process.env;
-    if (Date.now() - parseInt(REACT_APP_DATE_NOW, 10) > 1000 * 3600 * 24 * 7) {
+    if (Date.now() - parseInt(REACT_APP_DATE_NOW, 10) > 1000 * 3600 * 24 * 3) {
       if (!t) {
         t = true;
         enqueueSnackbar('Trial version expired! uyem.ru@gmail.com');

@@ -35,6 +35,57 @@ function* fetchUser(action: any) {
 }
 
 /**
+ * Обновление данных пользователя
+ * @param action
+ */
+function* userUpdate(action: any) {
+  try {
+    const data = yield call(Api.updateUser, action);
+    const type: Types.ActionTypesUserUpdate = 'USER_UPDATE_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
+    const type: Types.ActionTypesUserUpdate = 'USER_UPDATE_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Получение админом данных пользователя
+ * @param action
+ */
+function* getUserForAdmin(action: any) {
+  try {
+    const data = yield call(Api.getUser, action);
+    const type: Types.ActionTypesUserForAdmin = 'USER_FETCH_ADMIN_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
+    const type: Types.ActionTypesUserForAdmin = 'USER_FETCH_ADMIN_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
+ * Получение админом данных пользователей
+ * @param action
+ */
+function* getUsersForAdmin(action: any) {
+  try {
+    const data = yield call(Api.getUsers, action);
+    const type: Types.ActionTypesUsersForAdmin = 'USERS_FETCH_ADMIN_SUCCEEDED';
+    yield put({ type, data });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    if (dev) console.error(e);
+    const type: Types.ActionTypesUsersForAdmin = 'USERS_FETCH_ADMIN_FAILED';
+    yield put({ type, errorData });
+  }
+}
+
+/**
  * Вход пользователя
  * @param action
  */
@@ -356,6 +407,30 @@ function* updateCampaign(action: any) {
  */
 export function* userSaga() {
   yield takeLatest('USER_FETCH_REQUESTED', fetchUser);
+}
+
+/**
+ * Прослушиватель задачи изменения данных пользователя
+ */
+export function* userUpdateSaga() {
+  const type: Types.ActionTypesUserUpdate = 'USER_UPDATE_REQUESTED';
+  yield takeLatest(type, userUpdate);
+}
+
+/**
+ * Прослушиватель задачи получения админом данных пользователя
+ */
+export function* getUserForAdminSaga() {
+  const type: Types.ActionTypesUserForAdmin = 'USER_FETCH_ADMIN_REQUESTED';
+  yield takeLatest(type, getUserForAdmin);
+}
+
+/**
+ * Прослушиватель задачи получения админом данных пользователя
+ */
+export function* getUsersForAdminSaga() {
+  const type: Types.ActionTypesUsersForAdmin = 'USERS_FETCH_ADMIN_REQUESTED';
+  yield takeLatest(type, getUsersForAdmin);
 }
 
 /**

@@ -8,15 +8,33 @@ import {
   FormLabel,
   CircularProgress,
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import { useSnackbar } from 'notistack';
 import AlertMessage from '../components/AlertMessage';
 import { action, store, loadStore } from '../store';
 import * as Types from '../react-app-env';
 
+const body: any = document.querySelector('body');
+// Ширина контейнера формы
+const minWidth = body.clientWidth > 500 ? 500 : 300;
+
+const useStyles = makeStyles({
+  root: {
+    width: `${minWidth}px`,
+  },
+});
+
 let _storeSubs: any = () => {};
 let _loadStoreSubs: any = () => {};
 
-export default function Confirm() {
+interface ForgotInterface {
+  userEmail?: string;
+  showAsAdmin?: boolean;
+}
+
+export default function Forgot(props: ForgotInterface) {
+  const classes = useStyles();
+  const { userEmail, showAsAdmin } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [load, setLoad] = useState(false);
   const [email, setEmail] = useState('');
@@ -27,6 +45,9 @@ export default function Confirm() {
   };
   const [alert, setAlert] = useState(_alert);
   useEffect(() => {
+    if (userEmail) {
+      setEmail(userEmail);
+    }
     _loadStoreSubs = loadStore.subscribe(() => {
       setLoad(loadStore.getState().value);
     });
@@ -57,28 +78,35 @@ export default function Confirm() {
 
   return (
     <div className={clsx('col-center')}>
-      <div className="header">
-        <Typography variant="h4">Request to change password</Typography>
-      </div>
-      <FormGroup>
-        <FormLabel>Email</FormLabel>
-        <div className="form-item">
-          <TextField
-            defaultValue={email}
-            onChange={(e: any) => {
-              setEmail(e.target.value);
-            }}
-            type="email"
-            variant="outlined"
-            placeholder="email"
-          />
-        </div>
-      </FormGroup>
+      {userEmail ? (
+        ''
+      ) : (
+        <FormGroup className={classes.root}>
+          <div className="header">
+            <Typography variant="h4">Request to change password</Typography>
+          </div>
+          <FormLabel>Email</FormLabel>
+          <div className="form-item">
+            <TextField
+              fullWidth
+              value={email}
+              onChange={(e: any) => {
+                setEmail(e.target.value);
+              }}
+              type="email"
+              variant="outlined"
+              placeholder="email"
+            />
+          </div>
+        </FormGroup>
+      )}
       <div className="form-item">
         {load ? (
           <CircularProgress />
         ) : (
           <Button
+            disabled={showAsAdmin}
+            className={classes.root}
             variant="contained"
             color="secondary"
             type="submit"
@@ -88,7 +116,7 @@ export default function Confirm() {
               loadStore.dispatch({ type: 'SET_LOAD', value: true });
               action({ type: 'EMAIL_REQUESTED', args: { body: { email } } });
             }}>
-            Send
+            {userEmail ? 'Change password' : 'Send'}
           </Button>
         )}
       </div>

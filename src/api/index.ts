@@ -39,6 +39,36 @@ const Api = {
     },
   },
   /**
+   * Изменение данных пользователя
+   */
+  updateUser: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request('/user', 'PUT', context.args.body);
+    },
+  },
+  /**
+   * Получение админом данных пользователя
+   */
+  getUser: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request(`/user/${context.args.id}`, 'GET', context.args.body);
+    },
+  },
+  /**
+   * Получение админом данных пользователей
+   */
+  getUsers: {
+    context: this,
+    // eslint-disable-next-line no-unused-vars
+    fn: (context: any, ...args: any[]): any => {
+      return request('/user/admin', 'GET', context.args.params);
+    },
+  },
+  /**
    * Подтверждение почты
    */
   confirm: {

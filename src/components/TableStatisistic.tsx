@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
+import { Link } from 'react-router-dom';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -8,7 +9,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import * as Types from '../react-app-env';
-import BlockSelect from '../components/BlockSelect';
 
 const useStyles = makeStyles({
   table: {
@@ -62,8 +62,20 @@ export default function TableStatistic(props: Types.TableStatisticProps) {
               <TableCell component="th" scope="row">
                 {row.first}
               </TableCell>
-              <TableCell align="right">{row.value}</TableCell>
-              <TableCell align="right">{row.second}</TableCell>
+              <TableCell align="right">
+                {row.first === 'Campaign' ? (
+                  <Link to={`/campaign/${row.id}`}>{row.value}</Link>
+                ) : (
+                  row.second
+                )}
+              </TableCell>
+              <TableCell align="right">
+                {row.second !== '-' ? (
+                  <Link to={`/profile/${row.userId}`}>{row.second}</Link>
+                ) : (
+                  row.second
+                )}
+              </TableCell>
               <TableCell align="right">{row.impressions}</TableCell>
               <TableCell align="right">{row.requests}</TableCell>
               <TableCell align="right">{row.clicks}</TableCell>

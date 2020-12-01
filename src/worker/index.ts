@@ -65,6 +65,8 @@ export function computeTableData(data: any[], groupBy: Types.GroupBy): Types.Tab
         break;
     }
     return {
+      id: item.campaign,
+      userId: item.user_id,
       first,
       value,
       clicks: item.clicks,

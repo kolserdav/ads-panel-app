@@ -18,13 +18,14 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function SimpleSelect(props: Types.SelectProps) {
-  const { children, handleChange, value, name } = props;
+  const { children, handleChange, value, name, disabled } = props;
   const classes = useStyles();
   return (
     <div>
       <FormControl variant="outlined" className={classes.formControl}>
         <InputLabel id="demo-simple-select-outlined-label">{name}</InputLabel>
         <Select
+          disabled={disabled}
           color="secondary"
           labelId="demo-simple-select-outlined-label"
           id="demo-simple-select-outlined"

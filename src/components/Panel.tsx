@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
+import OffersIcon from '@material-ui/icons/Dashboard';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
@@ -23,6 +24,7 @@ import RegistrationIcon from '@material-ui/icons/PersonAdd';
 import HomeIcon from '@material-ui/icons/Home';
 import CampaignsIcon from '@material-ui/icons/LineStyle';
 import ProfileIcon from '@material-ui/icons/AccountBox';
+import UsersIcon from '@material-ui/icons/People';
 import LogoutIcon from '@material-ui/icons/ExitToApp';
 import CreateIcon from '@material-ui/icons/Queue';
 import { Link, useHistory } from 'react-router-dom';
@@ -153,7 +155,7 @@ export default function Panel(props: Types.PanelProps) {
       const state: any = store.getState().userData;
       if (state) {
         if (state.type === 'USER_FETCH_SUCCEEDED') {
-          setId(state.data?.body.user.id);
+          setId(state.data?.body?.user?.id);
         }
       }
     });
@@ -219,6 +221,16 @@ export default function Panel(props: Types.PanelProps) {
               </ListItem>
             </Link>
           </Auth>
+          <Auth redirect={false} roles={['admin']}>
+            <Link className="menu-link" to="/users">
+              <ListItem button selected={pathname === '/users'}>
+                <ListItemIcon>
+                  <UsersIcon />
+                </ListItemIcon>
+                <ListItemText primary="Users" />
+              </ListItem>
+            </Link>
+          </Auth>
         </List>
         <Divider />
         <List>
@@ -239,6 +251,16 @@ export default function Panel(props: Types.PanelProps) {
                   <CampaignsIcon />
                 </ListItemIcon>
                 <ListItemText primary="Campaigns" />
+              </ListItem>
+            </Link>
+          </Auth>
+          <Auth redirect={false} roles={['admin', 'user']}>
+            <Link className="menu-link" to="/offers">
+              <ListItem button selected={pathname === '/offers'}>
+                <ListItemIcon>
+                  <OffersIcon />
+                </ListItemIcon>
+                <ListItemText primary="Offers" />
               </ListItem>
             </Link>
           </Auth>
