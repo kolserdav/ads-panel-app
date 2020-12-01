@@ -20,8 +20,6 @@ export default function requestMultipart(
     const params: any = {
       method: 'POST',
       headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded, multipart/form-data',
         'xx-auth': jwtToken, // В большинстве запросов токен будет JWT
       },
       body: paramBody,
