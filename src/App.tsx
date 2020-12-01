@@ -47,10 +47,12 @@ const ConfirmEmailAlert = () => {
     const sS = store.subscribe(() => {
       const state = store.getState();
       const { userData }: any = state;
-      if (userData.type === 'USER_FETCH_SUCCEEDED') {
-        const { data }: any = userData;
-        if (data?.body?.user?.confirm === 0) {
-          setOpen(true);
+      if (userData) {
+        if (userData.type === 'USER_FETCH_SUCCEEDED') {
+          const { data }: any = userData;
+          if (data?.body?.user?.confirm === 0) {
+            setOpen(true);
+          }
         }
       }
     });
