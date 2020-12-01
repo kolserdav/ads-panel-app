@@ -636,7 +636,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
           setAlert(newAlert);
           if (data?.result === 'success') {
             setTimeout(() => {
-              history.push(`/update-campaign/${data.body.campaign.id}`);
+              history.push(`/campaign/${data.body.campaign.id}`);
             }, 1500);
           }
           loadStore.dispatch({ type: 'SET_LOAD', value: false });
@@ -775,8 +775,8 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
           updateOfferImage(offerId);
           setOffer(offerId);
           // Когда обновление кампании при новом оффере
+          _campaign.offer_id = offerId;
           if (update) {
-            _campaign.offer_id = offerId;
             updateCampaign();
           } else {
             getOffers();
