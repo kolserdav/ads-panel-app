@@ -20,10 +20,10 @@ export default function requestMultipart(
     const params: any = {
       method: 'POST',
       headers: {
-        'Content-type': 'multipart/form-data',
+        'Access-Control-Request-Headers': 'Origin',
         'xx-auth': jwtToken, // В большинстве запросов токен будет JWT
       },
-      body: paramBody
+      body: paramBody,
     };
     fetch(`${serverUrl}${path}`, params)
       .then((r: any) => r.json())
