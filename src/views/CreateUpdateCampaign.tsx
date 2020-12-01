@@ -305,7 +305,8 @@ let _campaign = {
   offer_id: -1,
 };
 
-const _copyCampaign = Object.assign(_campaign);
+// eslint-disable-next-line prefer-object-spread
+const _copyCampaign = Object.assign({}, _campaign);
 
 let _oldCountries: any[] = [];
 let _id: number = 0;
@@ -519,6 +520,9 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
   };
 
   useEffect(() => {
+    const hL = history.listen(() => {
+      _cleared = false;
+    });
     // при каждам обновлении запрашивает список оффера пользователя, по событию ответа начинаются движения
     getOffers();
     _loadStoreSubs = loadStore.subscribe(() => {
@@ -711,7 +715,8 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                 id: _id,
               },
             });
-          } else {
+          } else if (!_cleared) {
+            _cleared = true;
             // Чистим поля и задействованые глобальные переменные, если перешли с редактирования кампании
             _oldCountries = [];
             setCountries(<div />);
@@ -726,8 +731,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
             setBlackList([]);
             setOffer(-1);
             // eslint-disable-next-line prefer-object-spread
-            let _newO: any = {};
-            _campaign = Object.assign(_newO, _copyCampaign);
+            _campaign = Object.assign({}, _copyCampaign);
           }
           loadStore.dispatch({ type: 'SET_LOAD', value: false });
           const { data }: any = getOffersData;
@@ -820,6 +824,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
       return 0;
     });
     return () => {
+      hL();
       _storeSubs();
       _loadStoreSubs();
     };
