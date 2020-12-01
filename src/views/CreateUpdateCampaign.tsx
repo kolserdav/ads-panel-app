@@ -93,8 +93,8 @@ const OfferUpdate = (props: Types.OfferUpdateProps) => {
 
   useEffect(() => {}, [offerId]);
 
-  const fullIconName = `${getOfferImagePath(offerId)}/${offerIcon.name}`;
-  const fullImageName = `${getOfferImagePath(offerId)}/${offerImage.name}`;
+  const fullIconName = `${getOfferImagePath(offerId)}${offerIcon.name}`;
+  const fullImageName = `${getOfferImagePath(offerId)}${offerImage.name}`;
 
   return (
     <div>
