@@ -293,7 +293,7 @@ const OfferUpdate = (props: Types.OfferUpdateProps) => {
  * Сборщик мусора не пропускает стейты которые не задействованы в рендере,
  * поэтому для изменения и создания камнании updateCampaign и createCampaign пришлось устроить эти пляски с замыканиями(
  */
-const _campaign = {
+let _campaign = {
   title: '',
   link: '',
   countries: [],
@@ -304,6 +304,8 @@ const _campaign = {
   black_list: [],
   offer_id: -1,
 };
+
+const _copyCampaign = Object.assign(_campaign);
 
 let _oldCountries: any[] = [];
 let _id: number = 0;
@@ -709,8 +711,7 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
                 id: _id,
               },
             });
-          } else if (!_cleared) {
-            _cleared = true;
+          } else {
             // Чистим поля и задействованые глобальные переменные, если перешли с редактирования кампании
             _oldCountries = [];
             setCountries(<div />);
@@ -724,6 +725,9 @@ export default function CreateCampaign(props: Types.CreateCampaignProps) {
             setWhiteList([]);
             setBlackList([]);
             setOffer(-1);
+            // eslint-disable-next-line prefer-object-spread
+            let _newO: any = {};
+            _campaign = Object.assign(_newO, _copyCampaign);
           }
           loadStore.dispatch({ type: 'SET_LOAD', value: false });
           const { data }: any = getOffersData;
